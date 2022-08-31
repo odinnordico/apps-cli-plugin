@@ -22,6 +22,7 @@ package suite_test
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -88,6 +89,7 @@ type CommandLineIntegrationTestCase struct {
 	Name                      string
 	Skip                      bool
 	Focus                     bool
+	RequireEnvs               []string
 	WorkloadName              string
 	Command                   CommandLine
 	ShouldError               bool
@@ -142,6 +144,13 @@ func (cl CommandLineIntegrationTestCase) Run(t *testing.T, ctx context.Context, 
 	t.Run(cl.Name, func(t *testing.T) {
 		if cl.Skip {
 			t.SkipNow()
+		}
+		if len(cl.RequireEnvs) > 0 {
+			for _, e := range cl.RequireEnvs {
+				if _, ok := os.LookupEnv(e); !ok {
+					t.Skipf("Required %q environment variable not present, skipping test", e)
+				}
+			}
 		}
 		err := cl.Command.Exec()
 		// t.Logf("Command output:\n%s\n\n%v\n", cl.Command.String(), cl.Command.GetOutput())
