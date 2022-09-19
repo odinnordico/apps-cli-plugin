@@ -19,16 +19,20 @@ package testing
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/Netflix/go-expect"
 	"github.com/google/go-cmp/cmp"
 	"github.com/spf13/cobra"
 	rtesting "github.com/vmware-labs/reconciler-runtime/testing"
-	"k8s.io/apimachinery/pkg/runtime"
+	k8sruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/restmapper"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -165,11 +169,13 @@ type CommandTestCase struct {
 	// It is indended to clean up any state created in the Prepare step or during the test
 	// execution, or to make assertions for mocks.
 	CleanUp func(t *testing.T, ctx context.Context, config *cli.Config, tc *CommandTestCase) error
+	// WithConsoleInteractions receives function with an expect.Console that can be used to send characters and verify the output send to a fake console.
+	WithConsoleInteractions func(t *testing.T, console *expect.Console)
 }
 
 // Run each record for the table. Tables with a focused record will run only the focused records
 // and then fail, to prevent accidental check-in.
-func (ts CommandTestSuite) Run(t *testing.T, scheme *runtime.Scheme, cmdFactory func(context.Context, *cli.Config) *cobra.Command) {
+func (ts CommandTestSuite) Run(t *testing.T, scheme *k8sruntime.Scheme, cmdFactory func(context.Context, *cli.Config) *cobra.Command) {
 	t.Helper()
 	focused := CommandTestSuite{}
 	for _, tc := range ts {
@@ -191,7 +197,7 @@ func (ts CommandTestSuite) Run(t *testing.T, scheme *runtime.Scheme, cmdFactory 
 }
 
 // Run a single test case for the command. It is not common to run a record outside of a table.
-func (tc CommandTestCase) Run(t *testing.T, scheme *runtime.Scheme, cmdFactory func(context.Context, *cli.Config) *cobra.Command) {
+func (tc CommandTestCase) Run(t *testing.T, scheme *k8sruntime.Scheme, cmdFactory func(context.Context, *cli.Config) *cobra.Command) {
 	t.Run(tc.Name, func(t *testing.T) {
 		if tc.Skip {
 			t.SkipNow()
@@ -251,17 +257,10 @@ func (tc CommandTestCase) Run(t *testing.T, scheme *runtime.Scheme, cmdFactory f
 			},
 		)
 
-		cmd := cmdFactory(ctx, c)
-		cmd.SilenceErrors = true
-		cmd.SilenceUsage = true
-		cmd.SetArgs(tc.Args)
-
 		c.Stdin = bytes.NewBuffer(tc.Stdin)
 		output := &bytes.Buffer{}
-		cmd.SetOutput(output)
 		c.Stdout = output
 		c.Stderr = output
-
 		if tc.ShouldPanic {
 			defer func() {
 				if r := recover(); r == nil {
@@ -269,8 +268,47 @@ func (tc CommandTestCase) Run(t *testing.T, scheme *runtime.Scheme, cmdFactory f
 				}
 			}()
 		}
+
+		var console *expect.Console
+		var donec chan struct{}
+		if tc.WithConsoleInteractions != nil {
+			if runtime.GOOS == "windows" {
+				t.Skipf("test %q uses pseudo tty not supported yet for windows, skipping tets", tc.Name)
+			}
+			var err error
+			console, err = expect.NewConsole(expect.WithStdout(output), expectNoMatchingError(t), expectNoInputError(t), expect.WithDefaultTimeout(3*time.Second))
+			if err != nil {
+				t.Fatalf("failed to create console: %v", err)
+			}
+
+			c.Stdout = console.Tty()
+			c.Stderr = console.Tty()
+			c.Stdin = console.Tty()
+
+			defer console.Close()
+
+			donec = make(chan struct{})
+			go func() {
+				defer close(donec)
+				tc.WithConsoleInteractions(t, console)
+			}()
+		}
+
+		cmd := cmdFactory(ctx, c)
+		cmd.SilenceErrors = true
+		cmd.SilenceUsage = true
+		cmd.SetArgs(tc.Args)
+		cmd.SetOutput(c.Stdout)
+
 		cmdErr := cmd.Execute()
 
+		if console != nil {
+			console.Tty().Close()
+		}
+
+		if donec != nil {
+			<-donec
+		}
 		if expected, actual := tc.ShouldError, cmdErr != nil; expected != actual {
 			if expected {
 				t.Errorf("expected command to error, actual %v", cmdErr)
@@ -281,8 +319,9 @@ func (tc CommandTestCase) Run(t *testing.T, scheme *runtime.Scheme, cmdFactory f
 
 		expectConfig.AssertClientExpectations(t)
 
-		outputString := output.String()
+		outputString := strings.ReplaceAll(output.String(), "\r", "")
 		if tc.ExpectOutput != "" {
+			tc.ExpectOutput = strings.ReplaceAll(tc.ExpectOutput, "\r", "")
 			if diff := cmp.Diff(strings.TrimPrefix(tc.ExpectOutput, "\n"), outputString); diff != "" {
 				t.Errorf("Unexpected output (-expected, +actual): %s", diff)
 			}
@@ -303,4 +342,61 @@ func fakeExecCommand(helper string) func(context.Context, string, ...string) *ex
 		cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
 		return cmd
 	}
+}
+
+func trimTrailingSpaces(in string) string {
+	lines := strings.Split(in, "\n")
+	for i := len(lines) - 1; i >= 0; i-- {
+		lines[i] = strings.TrimRight(lines[i], " ")
+	}
+	return strings.Join(lines, "\n")
+}
+
+func expectNoMatchingError(t *testing.T) expect.ConsoleOpt {
+	return expect.WithExpectObserver(
+		func(matchers []expect.Matcher, buf string, err error) {
+			if err == nil {
+				return
+			}
+			if len(matchers) == 0 {
+				t.Fatalf("Error occurred while matching %q: %s\n", buf, err)
+			} else {
+				var criteria []string
+				for _, matcher := range matchers {
+					criteria = append(criteria, fmt.Sprintf("%q", matcher.Criteria()))
+				}
+				t.Fatalf("Unexpected output; expected: %s ; got %q: \nError: %s\n", strings.Join(criteria, ", "), buf, err)
+			}
+		},
+	)
+}
+
+func expectNoInputError(t *testing.T) expect.ConsoleOpt {
+	return expect.WithSendObserver(
+		func(msg string, num int, err error) {
+			if err == nil {
+				return
+			}
+			t.Fatalf("error while sending %q (%v) to the terminal: %v", msg, num, err)
+		})
+}
+
+// ToInteractTerminal writes the prompt with \r\n between each rune
+func ToInteractTerminal(format string, args ...any) string {
+	s := fmt.Sprintf(format, args...)
+	p := strings.Split(s, "")
+	return strings.Join(p, "\r\n")
+}
+
+// ToInteractOutput replaces \n to \r\n for interact library use
+func ToInteractOutput(format string, args ...any) string {
+	s := fmt.Sprintf(format, args...)
+	return strings.ReplaceAll(s, "\n", "\r\n")
+}
+
+// InteractInputLine generate a string based on the format and args with a EnterKey (\r) suffix
+func InteractInputLine(format string, args ...any) string {
+	s := fmt.Sprintf(format, args...)
+	s = strings.Trim(s, "/n")
+	return fmt.Sprintf("%s%s", s, string('\r'))
 }
