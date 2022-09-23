@@ -24,7 +24,7 @@ import (
 
 	diecorev1 "dies.dev/apis/core/v1"
 	diemetav1 "dies.dev/apis/meta/v1"
-	"github.com/Netflix/go-expect"
+	"github.com/ActiveState/termtest/expect"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
@@ -3285,13 +3285,15 @@ To get status: "tanzu apps workload get my-workload"
 			GivenObjects: givenNamespaceDefault,
 			Args:         []string{workloadName, flags.GitRepoFlagName, gitRepo, flags.GitBranchFlagName, gitBranch, flags.TypeFlagName, "web"},
 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
-				c.ExpectString(clitesting.ToInteractTerminal("Do you want to create this workload? [yN]: "))
+				c.ExpectString("Do you want to create this workload? [yN]: ")
 				c.Send(clitesting.InteractInputLine("y"))
 				c.ExpectString(clitesting.ToInteractOutput(`
 Created workload %q
 
 To see logs:   "tanzu apps workload tail %s"
-To get status: "tanzu apps workload get %s"`, workloadName, workloadName, workloadName))
+To get status: "tanzu apps workload get %s"
+
+`, workloadName, workloadName, workloadName))
 			},
 			ExpectCreates: []client.Object{
 				&cartov1alpha1.Workload{
@@ -3331,19 +3333,20 @@ Create workload:
      13 + |        branch: main
      14 + |      url: https://example.com/repo.git
 
-%s
-
+? Do you want to create this workload? [yN]: y
 Created workload %q
 
 To see logs:   "tanzu apps workload tail my-workload"
-To get status: "tanzu apps workload get my-workload"`, clitesting.ToInteractTerminal("? Do you want to create this workload? [yN]: y"), workloadName),
+To get status: "tanzu apps workload get my-workload"
+
+`, workloadName),
 		},
 		{
 			Name:         "create - git source with terminal interaction reject",
 			GivenObjects: givenNamespaceDefault,
 			Args:         []string{workloadName, flags.GitRepoFlagName, gitRepo, flags.GitBranchFlagName, gitBranch, flags.TypeFlagName, "web"},
 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
-				c.ExpectString(clitesting.ToInteractTerminal("Do you want to create this workload? [yN]: "))
+				c.ExpectString("Do you want to create this workload? [yN]: ")
 				c.Send(clitesting.InteractInputLine("n"))
 				c.ExpectString(clitesting.ToInteractOutput("Skipping workload %q", workloadName))
 			},
@@ -3364,21 +3367,22 @@ Create workload:
      13 + |        branch: main
      14 + |      url: https://example.com/repo.git
 
-%s
-
-Skipping workload %q`, clitesting.ToInteractTerminal("? Do you want to create this workload? [yN]: "), workloadName),
+? Do you want to create this workload? [yN]: 
+Skipping workload %q`, workloadName),
 		},
 		{
 			Name: "update - git source with terminal interaction",
 			Args: []string{workloadName, flags.TypeFlagName, "api"},
 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
-				c.ExpectString(clitesting.ToInteractTerminal("? Really update the workload %q? [yN]: ", workloadName))
+				c.ExpectString(fmt.Sprintf("? Really update the workload %q? [yN]: ", workloadName))
 				c.Send(clitesting.InteractInputLine("y"))
 				c.ExpectString(clitesting.ToInteractOutput(`
 Updated workload %q
 
 To see logs:   "tanzu apps workload tail %s"
-To get status: "tanzu apps workload get %s"`, workloadName, workloadName, workloadName))
+To get status: "tanzu apps workload get %s"
+
+`, workloadName, workloadName, workloadName))
 			},
 			GivenObjects: func() []client.Object {
 				w := &cartov1alpha1.Workload{
@@ -3438,18 +3442,19 @@ Update workload:
  10, 10   |  source:
 ...
 
-%s
-
+? Really update the workload %q? [yN]: y
 Updated workload %q
 
 To see logs:   "tanzu apps workload tail my-workload"
-To get status: "tanzu apps workload get my-workload"`, clitesting.ToInteractTerminal("? Really update the workload %q? [yN]: y", workloadName), workloadName),
+To get status: "tanzu apps workload get my-workload"
+
+`, workloadName, workloadName),
 		},
 		{
-			Name: "update - git source with terminal interaction rejected",
+			Name: "update - git source with terminal interaction reject",
 			Args: []string{workloadName, flags.TypeFlagName, "api"},
 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
-				c.ExpectString(clitesting.ToInteractTerminal("? Really update the workload %q? [yN]: ", workloadName))
+				c.ExpectString(fmt.Sprintf("? Really update the workload %q? [yN]: ", workloadName))
 				c.Send(clitesting.InteractInputLine("n"))
 				c.ExpectString(clitesting.ToInteractOutput("Skipping workload %q", workloadName))
 			},
@@ -3490,9 +3495,8 @@ Update workload:
  10, 10   |  source:
 ...
 
-%s
-
-Skipping workload %q`, clitesting.ToInteractTerminal("? Really update the workload %q? [yN]: ", workloadName), workloadName),
+? Really update the workload %q? [yN]: 
+Skipping workload %q`, workloadName, workloadName),
 		},
 	}
 

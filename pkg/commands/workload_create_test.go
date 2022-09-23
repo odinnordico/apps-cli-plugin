@@ -25,7 +25,7 @@ import (
 
 	diecorev1 "dies.dev/apis/core/v1"
 	diemetav1 "dies.dev/apis/meta/v1"
-	"github.com/Netflix/go-expect"
+	"github.com/ActiveState/termtest/expect"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
@@ -1302,13 +1302,15 @@ To get status: "tanzu apps workload get my-workload"
 			GivenObjects: givenNamespaceDefault,
 			Args:         []string{workloadName, flags.GitRepoFlagName, gitRepo, flags.GitBranchFlagName, gitBranch, flags.TypeFlagName, "web"},
 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
-				c.ExpectString(clitesting.ToInteractTerminal("Do you want to create this workload? [yN]: "))
+				c.ExpectString("Do you want to create this workload? [yN]: ")
 				c.Send(clitesting.InteractInputLine("y"))
 				c.ExpectString(clitesting.ToInteractOutput(`
 Created workload %q
 
 To see logs:   "tanzu apps workload tail %s"
-To get status: "tanzu apps workload get %s"`, workloadName, workloadName, workloadName))
+To get status: "tanzu apps workload get %s"
+
+`, workloadName, workloadName, workloadName))
 			},
 			ExpectCreates: []client.Object{
 				&cartov1alpha1.Workload{
@@ -1348,12 +1350,13 @@ Create workload:
      13 + |        branch: main
      14 + |      url: https://example.com/repo.git
 
-%s
-
+? Do you want to create this workload? [yN]: y
 Created workload %q
 
 To see logs:   "tanzu apps workload tail my-workload"
-To get status: "tanzu apps workload get my-workload"`, clitesting.ToInteractTerminal("? Do you want to create this workload? [yN]: y"), workloadName),
+To get status: "tanzu apps workload get my-workload"
+
+`, workloadName),
 		},
 
 		{
@@ -1361,7 +1364,7 @@ To get status: "tanzu apps workload get my-workload"`, clitesting.ToInteractTerm
 			GivenObjects: givenNamespaceDefault,
 			Args:         []string{workloadName, flags.GitRepoFlagName, gitRepo, flags.GitBranchFlagName, gitBranch, flags.TypeFlagName, "web"},
 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
-				c.ExpectString(clitesting.ToInteractTerminal("Do you want to create this workload? [yN]: "))
+				c.ExpectString("Do you want to create this workload? [yN]: ")
 				c.Send(clitesting.InteractInputLine("n"))
 				c.ExpectString(clitesting.ToInteractOutput("Skipping workload %q", workloadName))
 			},
@@ -1382,9 +1385,8 @@ Create workload:
      13 + |        branch: main
      14 + |      url: https://example.com/repo.git
 
-%s
-
-Skipping workload %q`, clitesting.ToInteractTerminal("? Do you want to create this workload? [yN]: "), workloadName),
+? Do you want to create this workload? [yN]: 
+Skipping workload %q`, workloadName),
 		},
 	}
 

@@ -1,0 +1,2259 @@
+diff --git a/go.mod b/go.mod
+index 868738a..726920e 100644
+--- a/go.mod
++++ b/go.mod
+@@ -4,15 +4,13 @@ go 1.19
+ 
+ require (
+ 	dies.dev v0.6.2
+-	github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2
++	github.com/ActiveState/termtest/expect v0.7.0
+ 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
+ 	github.com/cheggaaa/pb/v3 v3.1.0
+-	github.com/creack/pty v1.1.17
+ 	github.com/fatih/color v1.13.0
+ 	github.com/go-logr/logr v1.2.3
+ 	github.com/google/go-cmp v0.5.9
+ 	github.com/google/go-containerregistry v0.11.0
+-	github.com/hinshun/vt10x v0.0.0-20220119200601-820417d04eec
+ 	github.com/spf13/cobra v1.5.0
+ 	github.com/spf13/pflag v1.0.5
+ 	github.com/spf13/viper v1.13.0
+@@ -40,8 +38,12 @@ require (
+ 	cloud.google.com/go/compute v1.7.0 // indirect
+ 	cloud.google.com/go/iam v0.3.0 // indirect
+ 	cloud.google.com/go/storage v1.22.1 // indirect
++	github.com/ActiveState/termtest/conpty v0.5.0 // indirect
++	github.com/ActiveState/termtest/xpty v0.6.0 // indirect
++	github.com/ActiveState/vt10x v1.3.1 // indirect
+ 	github.com/AlecAivazis/survey/v2 v2.3.6 // indirect
+ 	github.com/Azure/azure-sdk-for-go v66.0.0+incompatible // indirect
++	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
+ 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
+ 	github.com/Azure/go-autorest/autorest v0.11.27 // indirect
+ 	github.com/Azure/go-autorest/autorest/adal v0.9.20 // indirect
+@@ -59,6 +61,7 @@ require (
+ 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
+ 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
+ 	github.com/Microsoft/go-winio v0.5.2 // indirect
++	github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2 // indirect
+ 	github.com/PuerkitoBio/purell v1.1.1 // indirect
+ 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
+ 	github.com/VividCortex/ewma v1.1.1 // indirect
+@@ -92,6 +95,7 @@ require (
+ 	github.com/cppforlife/color v1.9.1-0.20200716202919-6706ac40b835 // indirect
+ 	github.com/cppforlife/go-cli-ui v0.0.0-20220425131040-94f26b16bc14 // indirect
+ 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
++	github.com/creack/pty v1.1.17 // indirect
+ 	github.com/davecgh/go-spew v1.1.1 // indirect
+ 	github.com/dimchansky/utfbom v1.1.1 // indirect
+ 	github.com/docker/cli v20.10.17+incompatible // indirect
+@@ -150,6 +154,7 @@ require (
+ 	github.com/k14s/starlark-go v0.0.0-20200720175618-3a5c849cc368 // indirect
+ 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
+ 	github.com/klauspost/compress v1.15.8 // indirect
++	github.com/kr/pty v1.1.8 // indirect
+ 	github.com/lithammer/dedent v1.1.0 // indirect
+ 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
+ 	github.com/magiconair/properties v1.8.6 // indirect
+diff --git a/go.sum b/go.sum
+index 3d8b286..53a6a15 100644
+--- a/go.sum
++++ b/go.sum
+@@ -71,6 +71,14 @@ contrib.go.opencensus.io/exporter/stackdriver v0.13.4/go.mod h1:aXENhDJ1Y4lIg4EU
+ dies.dev v0.6.2 h1:zOvIN6Cr8aoWbp9YrmDhLGgWSWIYFAX14Sf5nTzGDK4=
+ dies.dev v0.6.2/go.mod h1:ZO3Q4QFrmtHDvgG5iuGVqS4Vi4oBted6ifEK7pLstm0=
+ dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
++github.com/ActiveState/termtest/conpty v0.5.0 h1:JLUe6YDs4Jw4xNPCU+8VwTpniYOGeKzQg4SM2YHQNA8=
++github.com/ActiveState/termtest/conpty v0.5.0/go.mod h1:LO4208FLsxw6DcNZ1UtuGUMW+ga9PFtX4ntv8Ymg9og=
++github.com/ActiveState/termtest/expect v0.7.0 h1:VNrcfXTHXXoe7i+3WgF5QJhstQLGP4saj+XYM9ZzBvY=
++github.com/ActiveState/termtest/expect v0.7.0/go.mod h1:64QuJvMtMu7+H5U+5TSMBxAs1FAaLvRIyN7WPOICido=
++github.com/ActiveState/termtest/xpty v0.6.0 h1:L9c17TDfy+ed+tY5cMOErn0n2EYG4tj8StdxHmoPok8=
++github.com/ActiveState/termtest/xpty v0.6.0/go.mod h1:MmTm/62Ajq+D92emHq8LOu9Q+2+pkBurDLahkUP6Odg=
++github.com/ActiveState/vt10x v1.3.1 h1:7qi8BGXUEBghzBxfXSY0J77etO+L95PZQlwD7ay2mn0=
++github.com/ActiveState/vt10x v1.3.1/go.mod h1:8wJKd36c9NmCfGyPyOJmkvyIMvbUPfHkfdS8zZlK19s=
+ github.com/AlecAivazis/survey/v2 v2.3.6 h1:NvTuVHISgTHEHeBFqt6BHOe4Ny/NwGZr7w+F8S9ziyw=
+ github.com/AlecAivazis/survey/v2 v2.3.6/go.mod h1:4AuI9b7RjAR+G7v9+C4YSlX/YL3K3cWNXgWXOhllqvI=
+ github.com/Antonboom/errname v0.1.5/go.mod h1:DugbBstvPFQbv/5uLcRRzfrNqKE9tVdVCqWCLp6Cifo=
+@@ -134,6 +142,8 @@ github.com/Microsoft/go-winio v0.5.2 h1:a9IhgEQBCUEk6QCdml9CiJGhAws+YwffDHEMp1VM
+ github.com/Microsoft/go-winio v0.5.2/go.mod h1:WpS1mjBmmwHBEWmogvA2mj8546UReBk4v8QkMxJ6pZY=
+ github.com/NYTimes/gziphandler v0.0.0-20170623195520-56545f4a5d46/go.mod h1:3wb06e3pkSAbeQ52E9H9iFoQsEEwGN64994WTCIhntQ=
+ github.com/NYTimes/gziphandler v1.1.1/go.mod h1:n/CVRwUEOgIxrgPvAQhUUr9oeUtvrhMomdKFjzJNB0c=
++github.com/Netflix/go-expect v0.0.0-20180615182759-c93bf25de8e8/go.mod h1:oX5x61PbNXchhh0oikYAH+4Pcfw5LKv21+Jnpr6r6Pc=
++github.com/Netflix/go-expect v0.0.0-20200312175327-da48e75238e2/go.mod h1:oX5x61PbNXchhh0oikYAH+4Pcfw5LKv21+Jnpr6r6Pc=
+ github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2 h1:+vx7roKuyA63nhn5WAunQHLTznkw5W8b1Xc0dNjp83s=
+ github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2/go.mod h1:HBCaDeC1lPdgDeDbhX8XFpy1jqjK0IBG8W5K+xYqA0w=
+ github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
+@@ -186,6 +196,8 @@ github.com/ashanbrown/forbidigo v1.2.0/go.mod h1:vVW7PEdqEFqapJe95xHkTfB1+XvZXBF
+ github.com/ashanbrown/makezero v0.0.0-20210520155254-b6261585ddde/go.mod h1:oG9Dnez7/ESBqc4EdrdNlryeo7d0KcW1ftXHm7nU/UU=
+ github.com/aunum/log v0.0.0-20200821225356-38d2e2c8b489 h1:DKOk8ZLAPnn4P/qTwGj5x5wAMqHmaE1oL4+nl1laIu8=
+ github.com/aunum/log v0.0.0-20200821225356-38d2e2c8b489/go.mod h1:ze/JIQHfGKwpM8U2b39e8OH0KHt1ovEcjwPV3yfU+/c=
++github.com/autarch/testify v1.2.2 h1:9Q9V6zqhP7R6dv+zRUddv6kXKLo6ecQhnFRFWM71i1c=
++github.com/autarch/testify v1.2.2/go.mod h1:oDbHKfFv2/D5UtVrxkk90OKcb6P4/AqF1Pcf6ZbvDQo=
+ github.com/avinetworks/sdk v0.0.0-20201123134013-c157ef55b6f7 h1:UpBQmQ1gKLi+i+/Dohoqk7FfuxlYQYveajqs1pk/CvA=
+ github.com/aws/amazon-vpc-cni-k8s v1.10.1 h1:hFuId8HhDuB4GmeJCCrPPRlHHQljT9Hp8qY3wbS8i+o=
+ github.com/aws/aws-sdk-go v1.23.20/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
+@@ -388,6 +400,8 @@ github.com/fsnotify/fsnotify v1.5.4 h1:jRbGcIw6P2Meqdwuo0H1p6JVLbL5DHKAKlYndzMwV
+ github.com/fsnotify/fsnotify v1.5.4/go.mod h1:OVB6XrOHzAwXMpEM7uPOzcehqUV2UqJxmVXmkdnm1bU=
+ github.com/fullstorydev/grpcurl v1.6.0/go.mod h1:ZQ+ayqbKMJNhzLmbpCiurTVlaK2M/3nqZCxaQ2Ze/sM=
+ github.com/fzipp/gocyclo v0.3.1/go.mod h1:DJHO6AUmbdqj2ET4Z9iArSuwWgYDRryYt2wASxc7x3E=
++github.com/gdamore/encoding v0.0.0-20151215212835-b23993cbb635/go.mod h1:yrQYJKKDTrHmbYxI7CYi+/hbdiDT2m4Hj+t0ikCjsrQ=
++github.com/gdamore/tcell v1.0.1-0.20180608172421-b3cebc399d6f/go.mod h1:tqyG50u7+Ctv1w5VX67kLzKcj9YXR/JSBZQq/+mLl1A=
+ github.com/getkin/kin-openapi v0.76.0/go.mod h1:660oXbgy5JFMKreazJaQTw7o+X00qeSyhcnluiMv+Xg=
+ github.com/getkin/kin-openapi v0.94.0 h1:bAxg2vxgnHHHoeefVdmGbR+oxtJlcv5HsJJa3qmAHuo=
+ github.com/getsentry/raven-go v0.2.0/go.mod h1:KungGk8q33+aIAZUIVWZDr2OfAEBsO49PX4NzFV5kcQ=
+@@ -744,6 +758,7 @@ github.com/hashicorp/memberlist v0.1.3/go.mod h1:ajVTdAv/9Im8oMAAj5G31PhhMCZJV2p
+ github.com/hashicorp/memberlist v0.2.2/go.mod h1:MS2lj3INKhZjWNqd3N0m3J+Jxf3DAOnAH9VT3Sh9MUE=
+ github.com/hashicorp/serf v0.8.2/go.mod h1:6hOLApaqBFA1NXqRQAsxw9QxuDEvNxSQRwA/JwenrHc=
+ github.com/hashicorp/serf v0.9.5/go.mod h1:UWDWwZeL5cuWDJdl0C6wrvrUwEqtQ4ZKBKKENpqIUyk=
++github.com/hinshun/vt10x v0.0.0-20180809195222-d55458df857c/go.mod h1:DqJ97dSdRW1W22yXSB90986pcOyQ7r45iio1KN2ez1A=
+ github.com/hinshun/vt10x v0.0.0-20220119200601-820417d04eec h1:qv2VnGeEQHchGaZ/u7lxST/RaJw+cv273q79D81Xbog=
+ github.com/hinshun/vt10x v0.0.0-20220119200601-820417d04eec/go.mod h1:Q48J4R4DvxnHolD5P8pOtXigYlRuPLGl6moFx3ulM68=
+ github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
+@@ -855,6 +870,7 @@ github.com/lithammer/dedent v1.1.0/go.mod h1:jrXYCQtgg0nJiN+StA2KgR7w6CiQNv9Fd/Z
+ github.com/logrusorgru/aurora v0.0.0-20181002194514-a7b3b318ed4e/go.mod h1:7rIyQOR62GCctdiQpZ/zOJlFyk6y+94wXzv6RNZgaR4=
+ github.com/logrusorgru/aurora v2.0.3+incompatible h1:tOpm7WcpBTn4fjmVfgpQq0EfczGlG91VSDkswnjF5A8=
+ github.com/logrusorgru/aurora v2.0.3+incompatible/go.mod h1:7rIyQOR62GCctdiQpZ/zOJlFyk6y+94wXzv6RNZgaR4=
++github.com/lucasb-eyer/go-colorful v0.0.0-20180526135729-345fbb3dbcdb/go.mod h1:NXg0ArsFk0Y01623LgUqoqcouGDB+PwCCQlrwrG6xJ4=
+ github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0/go.mod h1:zJYVVT2jmtg6P3p1VtQj7WsuWi/y4VnjVBn7F8KPB3I=
+ github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
+ github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
+@@ -1181,6 +1197,7 @@ github.com/stretchr/objx v0.4.0 h1:M2gUjqZET1qApGOWNSnZ49BAIMX4F/1plDv3+l31EJ4=
+ github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
+ github.com/stretchr/testify v0.0.0-20170130113145-4d4bfba8f1d1/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
+ github.com/stretchr/testify v1.1.4/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
++github.com/stretchr/testify v1.2.1/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
+ github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
+ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
+ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
+@@ -1354,6 +1371,7 @@ golang.org/x/crypto v0.0.0-20190923035154-9ee001bba392/go.mod h1:/lpIB1dKB+9EgE3
+ golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
+ golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
+ golang.org/x/crypto v0.0.0-20200414173820-0848c9571904/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
++golang.org/x/crypto v0.0.0-20200427165652-729f1e841bcc/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
+ golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
+ golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
+ golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad/go.mod h1:jdWPYTVW3xRLrWPugEBEK3UY2ZEsg3UU495nc5E+M+I=
+@@ -1564,6 +1582,7 @@ golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527/go.mod h1:h1NjWce9XRLGQEsW7w
+ golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200331124033-c3d80250170d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200420163511-1957bb5e6d1f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
++golang.org/x/sys v0.0.0-20200428200454-593003d681fa/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200501052902-10377860bb8e/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200511232937-7e40ca221e25/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200515095857-1151b9dac4a9/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+@@ -1572,10 +1591,12 @@ golang.org/x/sys v0.0.0-20200523222454-059865788121/go.mod h1:h1NjWce9XRLGQEsW7w
+ golang.org/x/sys v0.0.0-20200615200032-f1bc736245b1/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200803210538-64077c9b5642/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
++golang.org/x/sys v0.0.0-20200821140526-fda516888d29/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200905004654-be1d3432aa8f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200923182605-d9f96fdee20d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
++golang.org/x/sys v0.0.0-20201018230417-eeed37f84f13/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20201201145000-ef89a241ccb3/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+ golang.org/x/sys v0.0.0-20210104204734-6f8348627aad/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+@@ -1981,6 +2002,7 @@ google.golang.org/protobuf v1.26.0/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQ
+ google.golang.org/protobuf v1.27.1/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
+ google.golang.org/protobuf v1.28.0 h1:w43yiav+6bVFTBQFZX0r7ipe9JQ1QsbMgHwbBziscLw=
+ google.golang.org/protobuf v1.28.0/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
++gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0/go.mod h1:OdE7CF6DbADk7lN8LIKRzRJTTZXIjtWgA5THM5lhBAw=
+ gopkg.in/alecthomas/kingpin.v2 v2.2.6/go.mod h1:FMv+mEhP44yOT+4EoQTLFTRgOQ1FBLkstjWtayDeSgw=
+ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+ gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+diff --git a/pkg/cli-runtime/testing/command_table.go b/pkg/cli-runtime/testing/command_table.go
+index 8d6be32..2eee899 100644
+--- a/pkg/cli-runtime/testing/command_table.go
++++ b/pkg/cli-runtime/testing/command_table.go
+@@ -20,15 +20,15 @@ import (
+ 	"bytes"
+ 	"context"
+ 	"fmt"
++	"io"
+ 	"net/http"
+ 	"os"
+ 	"os/exec"
+-	"runtime"
+ 	"strings"
+ 	"testing"
+ 	"time"
+ 
+-	"github.com/Netflix/go-expect"
++	"github.com/ActiveState/termtest/expect"
+ 	"github.com/google/go-cmp/cmp"
+ 	"github.com/spf13/cobra"
+ 	rtesting "github.com/vmware-labs/reconciler-runtime/testing"
+@@ -272,9 +272,6 @@ func (tc CommandTestCase) Run(t *testing.T, scheme *k8sruntime.Scheme, cmdFactor
+ 		var console *expect.Console
+ 		var donec chan struct{}
+ 		if tc.WithConsoleInteractions != nil {
+-			if runtime.GOOS == "windows" {
+-				t.Skipf("test %q uses pseudo tty not supported yet for windows, skipping tets", tc.Name)
+-			}
+ 			var err error
+ 			console, err = expect.NewConsole(expect.WithStdout(output), expectNoMatchingError(t), expectNoInputError(t), expect.WithDefaultTimeout(3*time.Second))
+ 			if err != nil {
+@@ -321,7 +318,6 @@ func (tc CommandTestCase) Run(t *testing.T, scheme *k8sruntime.Scheme, cmdFactor
+ 
+ 		outputString := strings.ReplaceAll(output.String(), "\r", "")
+ 		if tc.ExpectOutput != "" {
+-			tc.ExpectOutput = strings.ReplaceAll(tc.ExpectOutput, "\r", "")
+ 			if diff := cmp.Diff(strings.TrimPrefix(tc.ExpectOutput, "\n"), outputString); diff != "" {
+ 				t.Errorf("Unexpected output (-expected, +actual): %s", diff)
+ 			}
+@@ -354,18 +350,19 @@ func trimTrailingSpaces(in string) string {
+ 
+ func expectNoMatchingError(t *testing.T) expect.ConsoleOpt {
+ 	return expect.WithExpectObserver(
+-		func(matchers []expect.Matcher, buf string, err error) {
+-			if err == nil {
++		func(matchers []expect.Matcher, ms *expect.MatchState, err error) {
++			if err == nil || err == io.EOF {
+ 				return
+ 			}
+ 			if len(matchers) == 0 {
+-				t.Fatalf("Error occurred while matching %q: %s\n", buf, err)
++				t.Fatalf("Error occurred while matching %q: %s\n", ms.Buf, err)
+ 			} else {
++
+ 				var criteria []string
+ 				for _, matcher := range matchers {
+ 					criteria = append(criteria, fmt.Sprintf("%q", matcher.Criteria()))
+ 				}
+-				t.Fatalf("Unexpected output; expected: %s ; got %q: \nError: %s\n", strings.Join(criteria, ", "), buf, err)
++				t.Fatalf("Unexpectedß output; expected: %s ; got %q: \nError: %s\n", strings.Join(criteria, ", "), ms.Buf, err)
+ 			}
+ 		},
+ 	)
+diff --git a/pkg/commands/workload_apply_test.go b/pkg/commands/workload_apply_test.go
+index 2ec703b..6756ef8 100644
+--- a/pkg/commands/workload_apply_test.go
++++ b/pkg/commands/workload_apply_test.go
+@@ -24,7 +24,7 @@ import (
+ 
+ 	diecorev1 "dies.dev/apis/core/v1"
+ 	diemetav1 "dies.dev/apis/meta/v1"
+-	"github.com/Netflix/go-expect"
++	"github.com/ActiveState/termtest/expect"
+ 	"github.com/spf13/cobra"
+ 	"github.com/stretchr/testify/mock"
+ 	corev1 "k8s.io/api/core/v1"
+@@ -3285,13 +3285,15 @@ To get status: "tanzu apps workload get my-workload"
+ 			GivenObjects: givenNamespaceDefault,
+ 			Args:         []string{workloadName, flags.GitRepoFlagName, gitRepo, flags.GitBranchFlagName, gitBranch, flags.TypeFlagName, "web"},
+ 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
+-				c.ExpectString(clitesting.ToInteractTerminal("Do you want to create this workload? [yN]: "))
++				c.ExpectString("Do you want to create this workload? [yN]: ")
+ 				c.Send(clitesting.InteractInputLine("y"))
+ 				c.ExpectString(clitesting.ToInteractOutput(`
+ Created workload %q
+ 
+ To see logs:   "tanzu apps workload tail %s"
+-To get status: "tanzu apps workload get %s"`, workloadName, workloadName, workloadName))
++To get status: "tanzu apps workload get %s"
++
++`, workloadName, workloadName, workloadName))
+ 			},
+ 			ExpectCreates: []client.Object{
+ 				&cartov1alpha1.Workload{
+@@ -3331,19 +3333,20 @@ Create workload:
+      13 + |        branch: main
+      14 + |      url: https://example.com/repo.git
+ 
+-%s
+-
++? Do you want to create this workload? [yN]: y
+ Created workload %q
+ 
+ To see logs:   "tanzu apps workload tail my-workload"
+-To get status: "tanzu apps workload get my-workload"`, clitesting.ToInteractTerminal("? Do you want to create this workload? [yN]: y"), workloadName),
++To get status: "tanzu apps workload get my-workload"
++
++`, workloadName),
+ 		},
+ 		{
+ 			Name:         "create - git source with terminal interaction reject",
+ 			GivenObjects: givenNamespaceDefault,
+ 			Args:         []string{workloadName, flags.GitRepoFlagName, gitRepo, flags.GitBranchFlagName, gitBranch, flags.TypeFlagName, "web"},
+ 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
+-				c.ExpectString(clitesting.ToInteractTerminal("Do you want to create this workload? [yN]: "))
++				c.ExpectString("Do you want to create this workload? [yN]: ")
+ 				c.Send(clitesting.InteractInputLine("n"))
+ 				c.ExpectString(clitesting.ToInteractOutput("Skipping workload %q", workloadName))
+ 			},
+@@ -3364,21 +3367,22 @@ Create workload:
+      13 + |        branch: main
+      14 + |      url: https://example.com/repo.git
+ 
+-%s
+-
+-Skipping workload %q`, clitesting.ToInteractTerminal("? Do you want to create this workload? [yN]: "), workloadName),
++? Do you want to create this workload? [yN]: 
++Skipping workload %q`, workloadName),
+ 		},
+ 		{
+ 			Name: "update - git source with terminal interaction",
+ 			Args: []string{workloadName, flags.TypeFlagName, "api"},
+ 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
+-				c.ExpectString(clitesting.ToInteractTerminal("? Really update the workload %q? [yN]: ", workloadName))
++				c.ExpectString(fmt.Sprintf("? Really update the workload %q? [yN]: ", workloadName))
+ 				c.Send(clitesting.InteractInputLine("y"))
+ 				c.ExpectString(clitesting.ToInteractOutput(`
+ Updated workload %q
+ 
+ To see logs:   "tanzu apps workload tail %s"
+-To get status: "tanzu apps workload get %s"`, workloadName, workloadName, workloadName))
++To get status: "tanzu apps workload get %s"
++
++`, workloadName, workloadName, workloadName))
+ 			},
+ 			GivenObjects: func() []client.Object {
+ 				w := &cartov1alpha1.Workload{
+@@ -3438,18 +3442,19 @@ Update workload:
+  10, 10   |  source:
+ ...
+ 
+-%s
+-
++? Really update the workload %q? [yN]: y
+ Updated workload %q
+ 
+ To see logs:   "tanzu apps workload tail my-workload"
+-To get status: "tanzu apps workload get my-workload"`, clitesting.ToInteractTerminal("? Really update the workload %q? [yN]: y", workloadName), workloadName),
++To get status: "tanzu apps workload get my-workload"
++
++`, workloadName, workloadName),
+ 		},
+ 		{
+-			Name: "update - git source with terminal interaction rejected",
++			Name: "update - git source with terminal interaction reject",
+ 			Args: []string{workloadName, flags.TypeFlagName, "api"},
+ 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
+-				c.ExpectString(clitesting.ToInteractTerminal("? Really update the workload %q? [yN]: ", workloadName))
++				c.ExpectString(fmt.Sprintf("? Really update the workload %q? [yN]: ", workloadName))
+ 				c.Send(clitesting.InteractInputLine("n"))
+ 				c.ExpectString(clitesting.ToInteractOutput("Skipping workload %q", workloadName))
+ 			},
+@@ -3490,9 +3495,8 @@ Update workload:
+  10, 10   |  source:
+ ...
+ 
+-%s
+-
+-Skipping workload %q`, clitesting.ToInteractTerminal("? Really update the workload %q? [yN]: ", workloadName), workloadName),
++? Really update the workload %q? [yN]: 
++Skipping workload %q`, workloadName, workloadName),
+ 		},
+ 	}
+ 
+diff --git a/pkg/commands/workload_create_test.go b/pkg/commands/workload_create_test.go
+index 3bffd92..79a09d0 100644
+--- a/pkg/commands/workload_create_test.go
++++ b/pkg/commands/workload_create_test.go
+@@ -25,7 +25,7 @@ import (
+ 
+ 	diecorev1 "dies.dev/apis/core/v1"
+ 	diemetav1 "dies.dev/apis/meta/v1"
+-	"github.com/Netflix/go-expect"
++	"github.com/ActiveState/termtest/expect"
+ 	"github.com/spf13/cobra"
+ 	"github.com/stretchr/testify/mock"
+ 	corev1 "k8s.io/api/core/v1"
+@@ -1302,13 +1302,15 @@ To get status: "tanzu apps workload get my-workload"
+ 			GivenObjects: givenNamespaceDefault,
+ 			Args:         []string{workloadName, flags.GitRepoFlagName, gitRepo, flags.GitBranchFlagName, gitBranch, flags.TypeFlagName, "web"},
+ 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
+-				c.ExpectString(clitesting.ToInteractTerminal("Do you want to create this workload? [yN]: "))
++				c.ExpectString("Do you want to create this workload? [yN]: ")
+ 				c.Send(clitesting.InteractInputLine("y"))
+ 				c.ExpectString(clitesting.ToInteractOutput(`
+ Created workload %q
+ 
+ To see logs:   "tanzu apps workload tail %s"
+-To get status: "tanzu apps workload get %s"`, workloadName, workloadName, workloadName))
++To get status: "tanzu apps workload get %s"
++
++`, workloadName, workloadName, workloadName))
+ 			},
+ 			ExpectCreates: []client.Object{
+ 				&cartov1alpha1.Workload{
+@@ -1348,12 +1350,13 @@ Create workload:
+      13 + |        branch: main
+      14 + |      url: https://example.com/repo.git
+ 
+-%s
+-
++? Do you want to create this workload? [yN]: y
+ Created workload %q
+ 
+ To see logs:   "tanzu apps workload tail my-workload"
+-To get status: "tanzu apps workload get my-workload"`, clitesting.ToInteractTerminal("? Do you want to create this workload? [yN]: y"), workloadName),
++To get status: "tanzu apps workload get my-workload"
++
++`, workloadName),
+ 		},
+ 
+ 		{
+@@ -1361,7 +1364,7 @@ To get status: "tanzu apps workload get my-workload"`, clitesting.ToInteractTerm
+ 			GivenObjects: givenNamespaceDefault,
+ 			Args:         []string{workloadName, flags.GitRepoFlagName, gitRepo, flags.GitBranchFlagName, gitBranch, flags.TypeFlagName, "web"},
+ 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
+-				c.ExpectString(clitesting.ToInteractTerminal("Do you want to create this workload? [yN]: "))
++				c.ExpectString("Do you want to create this workload? [yN]: ")
+ 				c.Send(clitesting.InteractInputLine("n"))
+ 				c.ExpectString(clitesting.ToInteractOutput("Skipping workload %q", workloadName))
+ 			},
+@@ -1382,9 +1385,8 @@ Create workload:
+      13 + |        branch: main
+      14 + |      url: https://example.com/repo.git
+ 
+-%s
+-
+-Skipping workload %q`, clitesting.ToInteractTerminal("? Do you want to create this workload? [yN]: "), workloadName),
++? Do you want to create this workload? [yN]: 
++Skipping workload %q`, workloadName),
+ 		},
+ 	}
+ 
+diff --git a/pkg/commands/workload_delete_test.go b/pkg/commands/workload_delete_test.go
+index bc74f73..f7a2585 100644
+--- a/pkg/commands/workload_delete_test.go
++++ b/pkg/commands/workload_delete_test.go
+@@ -24,7 +24,7 @@ import (
+ 	"time"
+ 
+ 	diemetav1 "dies.dev/apis/meta/v1"
+-	"github.com/Netflix/go-expect"
++	"github.com/ActiveState/termtest/expect"
+ 	rtesting "github.com/vmware-labs/reconciler-runtime/testing"
+ 	"k8s.io/apimachinery/pkg/fields"
+ 	"k8s.io/apimachinery/pkg/labels"
+@@ -640,9 +640,9 @@ Deleted workload "spring-petclinic"
+ 			Args:         []string{workloadName},
+ 			GivenObjects: []client.Object{parent},
+ 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
+-				c.ExpectString(clitesting.ToInteractTerminal("Really delete the workload %q? [yN]: ", workloadName))
++				c.ExpectString(fmt.Sprintf("Really delete the workload %q? [yN]: ", workloadName))
+ 				c.Send(clitesting.InteractInputLine("y"))
+-				c.ExpectString(clitesting.ToInteractOutput("Deleted workload %q", workloadName))
++				c.ExpectString(fmt.Sprintf("Deleted workload %q", workloadName))
+ 			},
+ 			ExpectDeletes: []rtesting.DeleteRef{{
+ 				Group:     "carto.run",
+@@ -652,13 +652,13 @@ Deleted workload "spring-petclinic"
+ 			}},
+ 		},
+ 		{
+-			Name:         "delete workload with console interaction rejected",
++			Name:         "delete workload with console interaction reject",
+ 			Args:         []string{workloadName},
+ 			GivenObjects: []client.Object{parent},
+ 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
+-				c.ExpectString(clitesting.ToInteractTerminal("Really delete the workload %q? [yN]: ", workloadName))
++				c.ExpectString(fmt.Sprintf("Really delete the workload %q? [yN]: ", workloadName))
+ 				c.Send(clitesting.InteractInputLine("n"))
+-				c.ExpectString(clitesting.ToInteractOutput("Skipping workload %q", workloadName))
++				c.ExpectString(fmt.Sprintf("Skipping workload %q", workloadName))
+ 			},
+ 		},
+ 	}
+diff --git a/vendor/github.com/Netflix/go-expect/console.go b/vendor/github.com/Netflix/go-expect/console.go
+index a761323..26deead 100644
+--- a/vendor/github.com/Netflix/go-expect/console.go
++++ b/vendor/github.com/Netflix/go-expect/console.go
+@@ -57,9 +57,7 @@ type ConsoleOpts struct {
+ // ExpectObserver provides an interface for a function callback that will
+ // be called after each Expect operation.
+ // matchers will be the list of active matchers when an error occurred,
+-//
+-//	or a list of matchers that matched `buf` when err is nil.
+-//
++//   or a list of matchers that matched `buf` when err is nil.
+ // buf is the captured output that was matched against.
+ // err is error that might have occurred. May be nil.
+ type ExpectObserver func(matchers []Matcher, buf string, err error)
+diff --git a/vendor/github.com/hinshun/vt10x/.travis.yml b/vendor/github.com/hinshun/vt10x/.travis.yml
+deleted file mode 100644
+index 8c2998f..0000000
+--- a/vendor/github.com/hinshun/vt10x/.travis.yml
++++ /dev/null
+@@ -1,5 +0,0 @@
+-language: go
+-
+-go:
+-  - "1.10.2"
+-  - master
+diff --git a/vendor/github.com/hinshun/vt10x/LICENSE b/vendor/github.com/hinshun/vt10x/LICENSE
+deleted file mode 100644
+index a5976d6..0000000
+--- a/vendor/github.com/hinshun/vt10x/LICENSE
++++ /dev/null
+@@ -1,19 +0,0 @@
+-Copyright (C) 2013 James Gray
+-
+-Permission is hereby granted, free of charge, to any person obtaining a copy
+-of this software and associated documentation files (the "Software"), to deal
+-in the Software without restriction, including without liitation the rights
+-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-copies of the Software, and to permit persons to whom the Software is
+-furnished to do so, subject to the following conditions:
+-
+-The above copyright notice and thismssion notice shall be included in all
+-copies or substantial portions of the Software.
+-
+-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-SOFTWARE.
+diff --git a/vendor/github.com/hinshun/vt10x/README.md b/vendor/github.com/hinshun/vt10x/README.md
+deleted file mode 100644
+index 420318f..0000000
+--- a/vendor/github.com/hinshun/vt10x/README.md
++++ /dev/null
+@@ -1,9 +0,0 @@
+-# vt10x
+-
+-[![Build Status](https://travis-ci.org/hinshun/vt10x.svg?branch=master)](https://travis-ci.org/hinshun/vt10x)
+-[![GoDoc](https://godoc.org/github.com/hinshun/vt10x?status.svg)](https://godoc.org/github.com/hinshun/vt10x)
+-
+-Package vt10x is a vt10x terminal emulation backend, influenced
+-largely by st, rxvt, xterm, and iTerm as reference. Use it for terminal
+-muxing, a terminal emulation frontend, or wherever else you need
+-terminal emulation.
+diff --git a/vendor/github.com/hinshun/vt10x/color.go b/vendor/github.com/hinshun/vt10x/color.go
+deleted file mode 100644
+index 4ce0d8f..0000000
+--- a/vendor/github.com/hinshun/vt10x/color.go
++++ /dev/null
+@@ -1,37 +0,0 @@
+-package vt10x
+-
+-// ANSI color values
+-const (
+-	Black Color = iota
+-	Red
+-	Green
+-	Yellow
+-	Blue
+-	Magenta
+-	Cyan
+-	LightGrey
+-	DarkGrey
+-	LightRed
+-	LightGreen
+-	LightYellow
+-	LightBlue
+-	LightMagenta
+-	LightCyan
+-	White
+-)
+-
+-// Default colors are potentially distinct to allow for special behavior.
+-// For example, a transparent background. Otherwise, the simple case is to
+-// map default colors to another color.
+-const (
+-	DefaultFG Color = 0xff80 + iota
+-	DefaultBG
+-)
+-
+-// Color maps to the ANSI colors [0, 16) and the xterm colors [16, 256).
+-type Color uint16
+-
+-// ANSI returns true if Color is within [0, 16).
+-func (c Color) ANSI() bool {
+-	return (c < 16)
+-}
+diff --git a/vendor/github.com/hinshun/vt10x/csi.go b/vendor/github.com/hinshun/vt10x/csi.go
+deleted file mode 100644
+index f5df174..0000000
+--- a/vendor/github.com/hinshun/vt10x/csi.go
++++ /dev/null
+@@ -1,189 +0,0 @@
+-package vt10x
+-
+-import (
+-	"fmt"
+-	"strconv"
+-	"strings"
+-)
+-
+-// CSI (Control Sequence Introducer)
+-// ESC+[
+-type csiEscape struct {
+-	buf  []byte
+-	args []int
+-	mode byte
+-	priv bool
+-}
+-
+-func (c *csiEscape) reset() {
+-	c.buf = c.buf[:0]
+-	c.args = c.args[:0]
+-	c.mode = 0
+-	c.priv = false
+-}
+-
+-func (c *csiEscape) put(b byte) bool {
+-	c.buf = append(c.buf, b)
+-	if b >= 0x40 && b <= 0x7E || len(c.buf) >= 256 {
+-		c.parse()
+-		return true
+-	}
+-	return false
+-}
+-
+-func (c *csiEscape) parse() {
+-	c.mode = c.buf[len(c.buf)-1]
+-	if len(c.buf) == 1 {
+-		return
+-	}
+-	s := string(c.buf)
+-	c.args = c.args[:0]
+-	if s[0] == '?' {
+-		c.priv = true
+-		s = s[1:]
+-	}
+-	s = s[:len(s)-1]
+-	ss := strings.Split(s, ";")
+-	for _, p := range ss {
+-		i, err := strconv.Atoi(p)
+-		if err != nil {
+-			//t.logf("invalid CSI arg '%s'\n", p)
+-			break
+-		}
+-		c.args = append(c.args, i)
+-	}
+-}
+-
+-func (c *csiEscape) arg(i, def int) int {
+-	if i >= len(c.args) || i < 0 {
+-		return def
+-	}
+-	return c.args[i]
+-}
+-
+-// maxarg takes the maximum of arg(i, def) and def
+-func (c *csiEscape) maxarg(i, def int) int {
+-	return max(c.arg(i, def), def)
+-}
+-
+-func (t *State) handleCSI() {
+-	c := &t.csi
+-	switch c.mode {
+-	default:
+-		goto unknown
+-	case '@': // ICH - insert <n> blank char
+-		t.insertBlanks(c.arg(0, 1))
+-	case 'A': // CUU - cursor <n> up
+-		t.moveTo(t.cur.X, t.cur.Y-c.maxarg(0, 1))
+-	case 'B', 'e': // CUD, VPR - cursor <n> down
+-		t.moveTo(t.cur.X, t.cur.Y+c.maxarg(0, 1))
+-	case 'c': // DA - device attributes
+-		if c.arg(0, 0) == 0 {
+-			// TODO: write vt102 id
+-		}
+-	case 'C', 'a': // CUF, HPR - cursor <n> forward
+-		t.moveTo(t.cur.X+c.maxarg(0, 1), t.cur.Y)
+-	case 'D': // CUB - cursor <n> backward
+-		t.moveTo(t.cur.X-c.maxarg(0, 1), t.cur.Y)
+-	case 'E': // CNL - cursor <n> down and first col
+-		t.moveTo(0, t.cur.Y+c.arg(0, 1))
+-	case 'F': // CPL - cursor <n> up and first col
+-		t.moveTo(0, t.cur.Y-c.arg(0, 1))
+-	case 'g': // TBC - tabulation clear
+-		switch c.arg(0, 0) {
+-		// clear current tab stop
+-		case 0:
+-			t.tabs[t.cur.X] = false
+-		// clear all tabs
+-		case 3:
+-			for i := range t.tabs {
+-				t.tabs[i] = false
+-			}
+-		default:
+-			goto unknown
+-		}
+-	case 'G', '`': // CHA, HPA - Move to <col>
+-		t.moveTo(c.arg(0, 1)-1, t.cur.Y)
+-	case 'H', 'f': // CUP, HVP - move to <row> <col>
+-		t.moveAbsTo(c.arg(1, 1)-1, c.arg(0, 1)-1)
+-	case 'I': // CHT - cursor forward tabulation <n> tab stops
+-		n := c.arg(0, 1)
+-		for i := 0; i < n; i++ {
+-			t.putTab(true)
+-		}
+-	case 'J': // ED - clear screen
+-		// TODO: sel.ob.x = -1
+-		switch c.arg(0, 0) {
+-		case 0: // below
+-			t.clear(t.cur.X, t.cur.Y, t.cols-1, t.cur.Y)
+-			if t.cur.Y < t.rows-1 {
+-				t.clear(0, t.cur.Y+1, t.cols-1, t.rows-1)
+-			}
+-		case 1: // above
+-			if t.cur.Y > 1 {
+-				t.clear(0, 0, t.cols-1, t.cur.Y-1)
+-			}
+-			t.clear(0, t.cur.Y, t.cur.X, t.cur.Y)
+-		case 2: // all
+-			t.clear(0, 0, t.cols-1, t.rows-1)
+-		default:
+-			goto unknown
+-		}
+-	case 'K': // EL - clear line
+-		switch c.arg(0, 0) {
+-		case 0: // right
+-			t.clear(t.cur.X, t.cur.Y, t.cols-1, t.cur.Y)
+-		case 1: // left
+-			t.clear(0, t.cur.Y, t.cur.X, t.cur.Y)
+-		case 2: // all
+-			t.clear(0, t.cur.Y, t.cols-1, t.cur.Y)
+-		}
+-	case 'S': // SU - scroll <n> lines up
+-		t.scrollUp(t.top, c.arg(0, 1))
+-	case 'T': // SD - scroll <n> lines down
+-		t.scrollDown(t.top, c.arg(0, 1))
+-	case 'L': // IL - insert <n> blank lines
+-		t.insertBlankLines(c.arg(0, 1))
+-	case 'l': // RM - reset mode
+-		t.setMode(c.priv, false, c.args)
+-	case 'M': // DL - delete <n> lines
+-		t.deleteLines(c.arg(0, 1))
+-	case 'X': // ECH - erase <n> chars
+-		t.clear(t.cur.X, t.cur.Y, t.cur.X+c.arg(0, 1)-1, t.cur.Y)
+-	case 'P': // DCH - delete <n> chars
+-		t.deleteChars(c.arg(0, 1))
+-	case 'Z': // CBT - cursor backward tabulation <n> tab stops
+-		n := c.arg(0, 1)
+-		for i := 0; i < n; i++ {
+-			t.putTab(false)
+-		}
+-	case 'd': // VPA - move to <row>
+-		t.moveAbsTo(t.cur.X, c.arg(0, 1)-1)
+-	case 'h': // SM - set terminal mode
+-		t.setMode(c.priv, true, c.args)
+-	case 'm': // SGR - terminal attribute (color)
+-		t.setAttr(c.args)
+-	case 'n':
+-		switch c.arg(0, 0) {
+-		case 5: // DSR - device status report
+-			t.w.Write([]byte("\033[0n"))
+-		case 6: // CPR - cursor position report
+-			t.w.Write([]byte(fmt.Sprintf("\033[%d;%dR", t.cur.Y+1, t.cur.X+1)))
+-		}
+-	case 'r': // DECSTBM - set scrolling region
+-		if c.priv {
+-			goto unknown
+-		} else {
+-			t.setScroll(c.arg(0, 1)-1, c.arg(1, t.rows)-1)
+-			t.moveAbsTo(0, 0)
+-		}
+-	case 's': // DECSC - save cursor position (ANSI.SYS)
+-		t.saveCursor()
+-	case 'u': // DECRC - restore cursor position (ANSI.SYS)
+-		t.restoreCursor()
+-	}
+-	return
+-unknown: // TODO: get rid of this goto
+-	t.logf("unknown CSI sequence '%c'\n", c.mode)
+-	// TODO: c.dump()
+-}
+diff --git a/vendor/github.com/hinshun/vt10x/doc.go b/vendor/github.com/hinshun/vt10x/doc.go
+deleted file mode 100644
+index 8205207..0000000
+--- a/vendor/github.com/hinshun/vt10x/doc.go
++++ /dev/null
+@@ -1,9 +0,0 @@
+-/*
+-Package terminal is a vt10x terminal emulation backend, influenced
+-largely by st, rxvt, xterm, and iTerm as reference. Use it for terminal
+-muxing, a terminal emulation frontend, or wherever else you need
+-terminal emulation.
+-
+-In development, but very usable.
+-*/
+-package vt10x
+diff --git a/vendor/github.com/hinshun/vt10x/ioctl_other.go b/vendor/github.com/hinshun/vt10x/ioctl_other.go
+deleted file mode 100644
+index 0aa1868..0000000
+--- a/vendor/github.com/hinshun/vt10x/ioctl_other.go
++++ /dev/null
+@@ -1,15 +0,0 @@
+-// +build plan9 nacl windows
+-
+-package vt10x
+-
+-import (
+-	"os"
+-)
+-
+-func ioctl(f *os.File, cmd, p uintptr) error {
+-	return nil
+-}
+-
+-func ResizePty(*os.File) error {
+-	return nil
+-}
+diff --git a/vendor/github.com/hinshun/vt10x/ioctl_posix.go b/vendor/github.com/hinshun/vt10x/ioctl_posix.go
+deleted file mode 100644
+index 7b81b3a..0000000
+--- a/vendor/github.com/hinshun/vt10x/ioctl_posix.go
++++ /dev/null
+@@ -1,31 +0,0 @@
+-// +build linux darwin dragonfly solaris openbsd netbsd freebsd
+-
+-package vt10x
+-
+-import (
+-	"os"
+-	"syscall"
+-	"unsafe"
+-)
+-
+-func ioctl(f *os.File, cmd, p uintptr) error {
+-	_, _, errno := syscall.Syscall(
+-		syscall.SYS_IOCTL,
+-		f.Fd(),
+-		syscall.TIOCSWINSZ,
+-		p)
+-	if errno != 0 {
+-		return syscall.Errno(errno)
+-	}
+-	return nil
+-}
+-
+-func ResizePty(pty *os.File, cols, rows int) error {
+-	var w struct{ row, col, xpix, ypix uint16 }
+-	w.row = uint16(rows)
+-	w.col = uint16(cols)
+-	w.xpix = 16 * uint16(cols)
+-	w.ypix = 16 * uint16(rows)
+-	return ioctl(pty, syscall.TIOCSWINSZ,
+-		uintptr(unsafe.Pointer(&w)))
+-}
+diff --git a/vendor/github.com/hinshun/vt10x/parse.go b/vendor/github.com/hinshun/vt10x/parse.go
+deleted file mode 100644
+index 0b84145..0000000
+--- a/vendor/github.com/hinshun/vt10x/parse.go
++++ /dev/null
+@@ -1,203 +0,0 @@
+-package vt10x
+-
+-func isControlCode(c rune) bool {
+-	return c < 0x20 || c == 0177
+-}
+-
+-func (t *State) parse(c rune) {
+-	t.logf("%q", string(c))
+-	if isControlCode(c) {
+-		if t.handleControlCodes(c) || t.cur.Attr.Mode&attrGfx == 0 {
+-			return
+-		}
+-	}
+-	// TODO: update selection; see st.c:2450
+-
+-	if t.mode&ModeWrap != 0 && t.cur.State&cursorWrapNext != 0 {
+-		t.lines[t.cur.Y][t.cur.X].Mode |= attrWrap
+-		t.newline(true)
+-	}
+-
+-	if t.mode&ModeInsert != 0 && t.cur.X+1 < t.cols {
+-		// TODO: move shiz, look at st.c:2458
+-		t.logln("insert mode not implemented")
+-	}
+-
+-	t.setChar(c, &t.cur.Attr, t.cur.X, t.cur.Y)
+-	if t.cur.X+1 < t.cols {
+-		t.moveTo(t.cur.X+1, t.cur.Y)
+-	} else {
+-		t.cur.State |= cursorWrapNext
+-	}
+-}
+-
+-func (t *State) parseEsc(c rune) {
+-	if t.handleControlCodes(c) {
+-		return
+-	}
+-	next := t.parse
+-	t.logf("%q", string(c))
+-	switch c {
+-	case '[':
+-		next = t.parseEscCSI
+-	case '#':
+-		next = t.parseEscTest
+-	case 'P', // DCS - Device Control String
+-		'_', // APC - Application Program Command
+-		'^', // PM - Privacy Message
+-		']', // OSC - Operating System Command
+-		'k': // old title set compatibility
+-		t.str.reset()
+-		t.str.typ = c
+-		next = t.parseEscStr
+-	case '(': // set primary charset G0
+-		next = t.parseEscAltCharset
+-	case ')', // set secondary charset G1 (ignored)
+-		'*', // set tertiary charset G2 (ignored)
+-		'+': // set quaternary charset G3 (ignored)
+-	case 'D': // IND - linefeed
+-		if t.cur.Y == t.bottom {
+-			t.scrollUp(t.top, 1)
+-		} else {
+-			t.moveTo(t.cur.X, t.cur.Y+1)
+-		}
+-	case 'E': // NEL - next line
+-		t.newline(true)
+-	case 'H': // HTS - horizontal tab stop
+-		t.tabs[t.cur.X] = true
+-	case 'M': // RI - reverse index
+-		if t.cur.Y == t.top {
+-			t.scrollDown(t.top, 1)
+-		} else {
+-			t.moveTo(t.cur.X, t.cur.Y-1)
+-		}
+-	case 'Z': // DECID - identify terminal
+-		// TODO: write to our writer our id
+-	case 'c': // RIS - reset to initial state
+-		t.reset()
+-	case '=': // DECPAM - application keypad
+-		t.mode |= ModeAppKeypad
+-	case '>': // DECPNM - normal keypad
+-		t.mode &^= ModeAppKeypad
+-	case '7': // DECSC - save cursor
+-		t.saveCursor()
+-	case '8': // DECRC - restore cursor
+-		t.restoreCursor()
+-	case '\\': // ST - stop
+-	default:
+-		t.logf("unknown ESC sequence '%c'\n", c)
+-	}
+-	t.state = next
+-}
+-
+-func (t *State) parseEscCSI(c rune) {
+-	if t.handleControlCodes(c) {
+-		return
+-	}
+-	t.logf("%q", string(c))
+-	if t.csi.put(byte(c)) {
+-		t.state = t.parse
+-		t.handleCSI()
+-	}
+-}
+-
+-func (t *State) parseEscStr(c rune) {
+-	t.logf("%q", string(c))
+-	switch c {
+-	case '\033':
+-		t.state = t.parseEscStrEnd
+-	case '\a': // backwards compatiblity to xterm
+-		t.state = t.parse
+-		t.handleSTR()
+-	default:
+-		t.str.put(c)
+-	}
+-}
+-
+-func (t *State) parseEscStrEnd(c rune) {
+-	if t.handleControlCodes(c) {
+-		return
+-	}
+-	t.logf("%q", string(c))
+-	t.state = t.parse
+-	if c == '\\' {
+-		t.handleSTR()
+-	}
+-}
+-
+-func (t *State) parseEscAltCharset(c rune) {
+-	if t.handleControlCodes(c) {
+-		return
+-	}
+-	t.logf("%q", string(c))
+-	switch c {
+-	case '0': // line drawing set
+-		t.cur.Attr.Mode |= attrGfx
+-	case 'B': // USASCII
+-		t.cur.Attr.Mode &^= attrGfx
+-	case 'A', // UK (ignored)
+-		'<', // multinational (ignored)
+-		'5', // Finnish (ignored)
+-		'C', // Finnish (ignored)
+-		'K': // German (ignored)
+-	default:
+-		t.logf("unknown alt. charset '%c'\n", c)
+-	}
+-	t.state = t.parse
+-}
+-
+-func (t *State) parseEscTest(c rune) {
+-	if t.handleControlCodes(c) {
+-		return
+-	}
+-	// DEC screen alignment test
+-	if c == '8' {
+-		for y := 0; y < t.rows; y++ {
+-			for x := 0; x < t.cols; x++ {
+-				t.setChar('E', &t.cur.Attr, x, y)
+-			}
+-		}
+-	}
+-	t.state = t.parse
+-}
+-
+-func (t *State) handleControlCodes(c rune) bool {
+-	if !isControlCode(c) {
+-		return false
+-	}
+-	switch c {
+-	// HT
+-	case '\t':
+-		t.putTab(true)
+-	// BS
+-	case '\b':
+-		t.moveTo(t.cur.X-1, t.cur.Y)
+-	// CR
+-	case '\r':
+-		t.moveTo(0, t.cur.Y)
+-	// LF, VT, LF
+-	case '\f', '\v', '\n':
+-		// go to first col if mode is set
+-		t.newline(t.mode&ModeCRLF != 0)
+-	// BEL
+-	case '\a':
+-		// TODO: emit sound
+-		// TODO: window alert if not focused
+-	// ESC
+-	case 033:
+-		t.csi.reset()
+-		t.state = t.parseEsc
+-	// SO, SI
+-	case 016, 017:
+-		// different charsets not supported. apps should use the correct
+-		// alt charset escapes, probably for line drawing
+-	// SUB, CAN
+-	case 032, 030:
+-		t.csi.reset()
+-	// ignore ENQ, NUL, XON, XOFF, DEL
+-	case 005, 000, 021, 023, 0177:
+-	default:
+-		return false
+-	}
+-	return true
+-}
+diff --git a/vendor/github.com/hinshun/vt10x/state.go b/vendor/github.com/hinshun/vt10x/state.go
+deleted file mode 100644
+index dffbd21..0000000
+--- a/vendor/github.com/hinshun/vt10x/state.go
++++ /dev/null
+@@ -1,729 +0,0 @@
+-package vt10x
+-
+-import (
+-	"io"
+-	"log"
+-	"sync"
+-)
+-
+-const (
+-	tabspaces = 8
+-)
+-
+-const (
+-	attrReverse = 1 << iota
+-	attrUnderline
+-	attrBold
+-	attrGfx
+-	attrItalic
+-	attrBlink
+-	attrWrap
+-)
+-
+-const (
+-	cursorDefault = 1 << iota
+-	cursorWrapNext
+-	cursorOrigin
+-)
+-
+-// ModeFlag represents various terminal mode states.
+-type ModeFlag uint32
+-
+-// Terminal modes
+-const (
+-	ModeWrap ModeFlag = 1 << iota
+-	ModeInsert
+-	ModeAppKeypad
+-	ModeAltScreen
+-	ModeCRLF
+-	ModeMouseButton
+-	ModeMouseMotion
+-	ModeReverse
+-	ModeKeyboardLock
+-	ModeHide
+-	ModeEcho
+-	ModeAppCursor
+-	ModeMouseSgr
+-	Mode8bit
+-	ModeBlink
+-	ModeFBlink
+-	ModeFocus
+-	ModeMouseX10
+-	ModeMouseMany
+-	ModeMouseMask = ModeMouseButton | ModeMouseMotion | ModeMouseX10 | ModeMouseMany
+-)
+-
+-// ChangeFlag represents possible state changes of the terminal.
+-type ChangeFlag uint32
+-
+-// Terminal changes to occur in VT.ReadState
+-const (
+-	ChangedScreen ChangeFlag = 1 << iota
+-	ChangedTitle
+-)
+-
+-type Glyph struct {
+-	Char   rune
+-	Mode   int16
+-	FG, BG Color
+-}
+-
+-type line []Glyph
+-
+-type Cursor struct {
+-	Attr  Glyph
+-	X, Y  int
+-	State uint8
+-}
+-
+-type parseState func(c rune)
+-
+-// State represents the terminal emulation state. Use Lock/Unlock
+-// methods to synchronize data access with VT.
+-type State struct {
+-	DebugLogger *log.Logger
+-
+-	w             io.Writer
+-	mu            sync.Mutex
+-	changed       ChangeFlag
+-	cols, rows    int
+-	lines         []line
+-	altLines      []line
+-	dirty         []bool // line dirtiness
+-	anydirty      bool
+-	cur, curSaved Cursor
+-	top, bottom   int // scroll limits
+-	mode          ModeFlag
+-	state         parseState
+-	str           strEscape
+-	csi           csiEscape
+-	numlock       bool
+-	tabs          []bool
+-	title         string
+-}
+-
+-func (t *State) logf(format string, args ...interface{}) {
+-	if t.DebugLogger != nil {
+-		t.DebugLogger.Printf(format, args...)
+-	}
+-}
+-
+-func (t *State) logln(s string) {
+-	if t.DebugLogger != nil {
+-		t.DebugLogger.Println(s)
+-	}
+-}
+-
+-func (t *State) lock() {
+-	t.mu.Lock()
+-}
+-
+-func (t *State) unlock() {
+-	t.mu.Unlock()
+-}
+-
+-// Lock locks the state object's mutex.
+-func (t *State) Lock() {
+-	t.mu.Lock()
+-}
+-
+-// Unlock resets change flags and unlocks the state object's mutex.
+-func (t *State) Unlock() {
+-	t.resetChanges()
+-	t.mu.Unlock()
+-}
+-
+-// Cell returns the glyph containing the character code, foreground color, and
+-// background color at position (x, y) relative to the top left of the terminal.
+-func (t *State) Cell(x, y int) Glyph {
+-	return t.lines[y][x]
+-}
+-
+-// Cursor returns the current position of the cursor.
+-func (t *State) Cursor() Cursor {
+-	return t.cur
+-}
+-
+-// CursorVisible returns the visible state of the cursor.
+-func (t *State) CursorVisible() bool {
+-	return t.mode&ModeHide == 0
+-}
+-
+-// Mode returns the current terminal mode.
+-func (t *State) Mode() ModeFlag {
+-	return t.mode
+-}
+-
+-// Title returns the current title set via the tty.
+-func (t *State) Title() string {
+-	return t.title
+-}
+-
+-/*
+-// ChangeMask returns a bitfield of changes that have occured by VT.
+-func (t *State) ChangeMask() ChangeFlag {
+-	return t.changed
+-}
+-*/
+-
+-// Changed returns true if change has occured.
+-func (t *State) Changed(change ChangeFlag) bool {
+-	return t.changed&change != 0
+-}
+-
+-// resetChanges resets the change mask and dirtiness.
+-func (t *State) resetChanges() {
+-	for i := range t.dirty {
+-		t.dirty[i] = false
+-	}
+-	t.anydirty = false
+-	t.changed = 0
+-}
+-
+-func (t *State) saveCursor() {
+-	t.curSaved = t.cur
+-}
+-
+-func (t *State) restoreCursor() {
+-	t.cur = t.curSaved
+-	t.moveTo(t.cur.X, t.cur.Y)
+-}
+-
+-func (t *State) put(c rune) {
+-	t.state(c)
+-}
+-
+-func (t *State) putTab(forward bool) {
+-	x := t.cur.X
+-	if forward {
+-		if x == t.cols {
+-			return
+-		}
+-		for x++; x < t.cols && !t.tabs[x]; x++ {
+-		}
+-	} else {
+-		if x == 0 {
+-			return
+-		}
+-		for x--; x > 0 && !t.tabs[x]; x-- {
+-		}
+-	}
+-	t.moveTo(x, t.cur.Y)
+-}
+-
+-func (t *State) newline(firstCol bool) {
+-	y := t.cur.Y
+-	if y == t.bottom {
+-		cur := t.cur
+-		t.cur = t.defaultCursor()
+-		t.scrollUp(t.top, 1)
+-		t.cur = cur
+-	} else {
+-		y++
+-	}
+-	if firstCol {
+-		t.moveTo(0, y)
+-	} else {
+-		t.moveTo(t.cur.X, y)
+-	}
+-}
+-
+-// table from st, which in turn is from rxvt :)
+-var gfxCharTable = [62]rune{
+-	'↑', '↓', '→', '←', '█', '▚', '☃', // A - G
+-	0, 0, 0, 0, 0, 0, 0, 0, // H - O
+-	0, 0, 0, 0, 0, 0, 0, 0, // P - W
+-	0, 0, 0, 0, 0, 0, 0, ' ', // X - _
+-	'◆', '▒', '␉', '␌', '␍', '␊', '°', '±', // ` - g
+-	'␤', '␋', '┘', '┐', '┌', '└', '┼', '⎺', // h - o
+-	'⎻', '─', '⎼', '⎽', '├', '┤', '┴', '┬', // p - w
+-	'│', '≤', '≥', 'π', '≠', '£', '·', // x - ~
+-}
+-
+-func (t *State) setChar(c rune, attr *Glyph, x, y int) {
+-	if attr.Mode&attrGfx != 0 {
+-		if c >= 0x41 && c <= 0x7e && gfxCharTable[c-0x41] != 0 {
+-			c = gfxCharTable[c-0x41]
+-		}
+-	}
+-	t.changed |= ChangedScreen
+-	t.dirty[y] = true
+-	t.lines[y][x] = *attr
+-	t.lines[y][x].Char = c
+-	//if t.options.BrightBold && attr.Mode&attrBold != 0 && attr.FG < 8 {
+-	if attr.Mode&attrBold != 0 && attr.FG < 8 {
+-		t.lines[y][x].FG = attr.FG + 8
+-	}
+-	if attr.Mode&attrReverse != 0 {
+-		t.lines[y][x].FG = attr.BG
+-		t.lines[y][x].BG = attr.FG
+-	}
+-}
+-
+-func (t *State) defaultCursor() Cursor {
+-	c := Cursor{}
+-	c.Attr.FG = DefaultFG
+-	c.Attr.BG = DefaultBG
+-	return c
+-}
+-
+-func (t *State) reset() {
+-	t.cur = t.defaultCursor()
+-	t.saveCursor()
+-	for i := range t.tabs {
+-		t.tabs[i] = false
+-	}
+-	for i := tabspaces; i < len(t.tabs); i += tabspaces {
+-		t.tabs[i] = true
+-	}
+-	t.top = 0
+-	t.bottom = t.rows - 1
+-	t.mode = ModeWrap
+-	t.clear(0, 0, t.rows-1, t.cols-1)
+-	t.moveTo(0, 0)
+-}
+-
+-// TODO: definitely can improve allocs
+-func (t *State) resize(cols, rows int) bool {
+-	if cols == t.cols && rows == t.rows {
+-		return false
+-	}
+-	if cols < 1 || rows < 1 {
+-		return false
+-	}
+-	slide := t.cur.Y - rows + 1
+-	if slide > 0 {
+-		copy(t.lines, t.lines[slide:slide+rows])
+-		copy(t.altLines, t.altLines[slide:slide+rows])
+-	}
+-
+-	lines, altLines, tabs := t.lines, t.altLines, t.tabs
+-	t.lines = make([]line, rows)
+-	t.altLines = make([]line, rows)
+-	t.dirty = make([]bool, rows)
+-	t.tabs = make([]bool, cols)
+-
+-	minrows := min(rows, t.rows)
+-	mincols := min(cols, t.cols)
+-	t.changed |= ChangedScreen
+-	for i := 0; i < rows; i++ {
+-		t.dirty[i] = true
+-		t.lines[i] = make(line, cols)
+-		t.altLines[i] = make(line, cols)
+-	}
+-	for i := 0; i < minrows; i++ {
+-		copy(t.lines[i], lines[i])
+-		copy(t.altLines[i], altLines[i])
+-	}
+-	copy(t.tabs, tabs)
+-	if cols > t.cols {
+-		i := t.cols - 1
+-		for i > 0 && !tabs[i] {
+-			i--
+-		}
+-		for i += tabspaces; i < len(tabs); i += tabspaces {
+-			tabs[i] = true
+-		}
+-	}
+-
+-	t.cols = cols
+-	t.rows = rows
+-	t.setScroll(0, rows-1)
+-	t.moveTo(t.cur.X, t.cur.Y)
+-	for i := 0; i < 2; i++ {
+-		if mincols < cols && minrows > 0 {
+-			t.clear(mincols, 0, cols-1, minrows-1)
+-		}
+-		if cols > 0 && minrows < rows {
+-			t.clear(0, minrows, cols-1, rows-1)
+-		}
+-		t.swapScreen()
+-	}
+-	return slide > 0
+-}
+-
+-func (t *State) clear(x0, y0, x1, y1 int) {
+-	if x0 > x1 {
+-		x0, x1 = x1, x0
+-	}
+-	if y0 > y1 {
+-		y0, y1 = y1, y0
+-	}
+-	x0 = clamp(x0, 0, t.cols-1)
+-	x1 = clamp(x1, 0, t.cols-1)
+-	y0 = clamp(y0, 0, t.rows-1)
+-	y1 = clamp(y1, 0, t.rows-1)
+-	t.changed |= ChangedScreen
+-	for y := y0; y <= y1; y++ {
+-		t.dirty[y] = true
+-		for x := x0; x <= x1; x++ {
+-			t.lines[y][x] = t.cur.Attr
+-			t.lines[y][x].Char = ' '
+-		}
+-	}
+-}
+-
+-func (t *State) clearAll() {
+-	t.clear(0, 0, t.cols-1, t.rows-1)
+-}
+-
+-func (t *State) moveAbsTo(x, y int) {
+-	if t.cur.State&cursorOrigin != 0 {
+-		y += t.top
+-	}
+-	t.moveTo(x, y)
+-}
+-
+-func (t *State) moveTo(x, y int) {
+-	var miny, maxy int
+-	if t.cur.State&cursorOrigin != 0 {
+-		miny = t.top
+-		maxy = t.bottom
+-	} else {
+-		miny = 0
+-		maxy = t.rows - 1
+-	}
+-	x = clamp(x, 0, t.cols-1)
+-	y = clamp(y, miny, maxy)
+-	t.changed |= ChangedScreen
+-	t.cur.State &^= cursorWrapNext
+-	t.cur.X = x
+-	t.cur.Y = y
+-}
+-
+-func (t *State) swapScreen() {
+-	t.lines, t.altLines = t.altLines, t.lines
+-	t.mode ^= ModeAltScreen
+-	t.dirtyAll()
+-}
+-
+-func (t *State) dirtyAll() {
+-	t.changed |= ChangedScreen
+-	for y := 0; y < t.rows; y++ {
+-		t.dirty[y] = true
+-	}
+-}
+-
+-func (t *State) setScroll(top, bottom int) {
+-	top = clamp(top, 0, t.rows-1)
+-	bottom = clamp(bottom, 0, t.rows-1)
+-	if top > bottom {
+-		top, bottom = bottom, top
+-	}
+-	t.top = top
+-	t.bottom = bottom
+-}
+-
+-func min(a, b int) int {
+-	if a < b {
+-		return a
+-	}
+-	return b
+-}
+-
+-func max(a, b int) int {
+-	if a > b {
+-		return a
+-	}
+-	return b
+-}
+-
+-func clamp(val, min, max int) int {
+-	if val < min {
+-		return min
+-	} else if val > max {
+-		return max
+-	}
+-	return val
+-}
+-
+-func between(val, min, max int) bool {
+-	if val < min || val > max {
+-		return false
+-	}
+-	return true
+-}
+-
+-func (t *State) scrollDown(orig, n int) {
+-	n = clamp(n, 0, t.bottom-orig+1)
+-	t.clear(0, t.bottom-n+1, t.cols-1, t.bottom)
+-	t.changed |= ChangedScreen
+-	for i := t.bottom; i >= orig+n; i-- {
+-		t.lines[i], t.lines[i-n] = t.lines[i-n], t.lines[i]
+-		t.dirty[i] = true
+-		t.dirty[i-n] = true
+-	}
+-
+-	// TODO: selection scroll
+-}
+-
+-func (t *State) scrollUp(orig, n int) {
+-	n = clamp(n, 0, t.bottom-orig+1)
+-	t.clear(0, orig, t.cols-1, orig+n-1)
+-	t.changed |= ChangedScreen
+-	for i := orig; i <= t.bottom-n; i++ {
+-		t.lines[i], t.lines[i+n] = t.lines[i+n], t.lines[i]
+-		t.dirty[i] = true
+-		t.dirty[i+n] = true
+-	}
+-
+-	// TODO: selection scroll
+-}
+-
+-func (t *State) modMode(set bool, bit ModeFlag) {
+-	if set {
+-		t.mode |= bit
+-	} else {
+-		t.mode &^= bit
+-	}
+-}
+-
+-func (t *State) setMode(priv bool, set bool, args []int) {
+-	if priv {
+-		for _, a := range args {
+-			switch a {
+-			case 1: // DECCKM - cursor key
+-				t.modMode(set, ModeAppCursor)
+-			case 5: // DECSCNM - reverse video
+-				mode := t.mode
+-				t.modMode(set, ModeReverse)
+-				if mode != t.mode {
+-					// TODO: redraw
+-				}
+-			case 6: // DECOM - origin
+-				if set {
+-					t.cur.State |= cursorOrigin
+-				} else {
+-					t.cur.State &^= cursorOrigin
+-				}
+-				t.moveAbsTo(0, 0)
+-			case 7: // DECAWM - auto wrap
+-				t.modMode(set, ModeWrap)
+-			// IGNORED:
+-			case 0, // error
+-				2,  // DECANM - ANSI/VT52
+-				3,  // DECCOLM - column
+-				4,  // DECSCLM - scroll
+-				8,  // DECARM - auto repeat
+-				18, // DECPFF - printer feed
+-				19, // DECPEX - printer extent
+-				42, // DECNRCM - national characters
+-				12: // att610 - start blinking cursor
+-				break
+-			case 25: // DECTCEM - text cursor enable mode
+-				t.modMode(!set, ModeHide)
+-			case 9: // X10 mouse compatibility mode
+-				t.modMode(false, ModeMouseMask)
+-				t.modMode(set, ModeMouseX10)
+-			case 1000: // report button press
+-				t.modMode(false, ModeMouseMask)
+-				t.modMode(set, ModeMouseButton)
+-			case 1002: // report motion on button press
+-				t.modMode(false, ModeMouseMask)
+-				t.modMode(set, ModeMouseMotion)
+-			case 1003: // enable all mouse motions
+-				t.modMode(false, ModeMouseMask)
+-				t.modMode(set, ModeMouseMany)
+-			case 1004: // send focus events to tty
+-				t.modMode(set, ModeFocus)
+-			case 1006: // extended reporting mode
+-				t.modMode(set, ModeMouseSgr)
+-			case 1034:
+-				t.modMode(set, Mode8bit)
+-			case 1049, // = 1047 and 1048
+-				47, 1047:
+-				alt := t.mode&ModeAltScreen != 0
+-				if alt {
+-					t.clear(0, 0, t.cols-1, t.rows-1)
+-				}
+-				if !set || !alt {
+-					t.swapScreen()
+-				}
+-				if a != 1049 {
+-					break
+-				}
+-				fallthrough
+-			case 1048:
+-				if set {
+-					t.saveCursor()
+-				} else {
+-					t.restoreCursor()
+-				}
+-			case 1001:
+-				// mouse highlight mode; can hang the terminal by design when
+-				// implemented
+-			case 1005:
+-				// utf8 mouse mode; will confuse applications not supporting
+-				// utf8 and luit
+-			case 1015:
+-				// urxvt mangled mouse mode; incompatiblt and can be mistaken
+-				// for other control codes
+-			default:
+-				t.logf("unknown private set/reset mode %d\n", a)
+-			}
+-		}
+-	} else {
+-		for _, a := range args {
+-			switch a {
+-			case 0: // Error (ignored)
+-			case 2: // KAM - keyboard action
+-				t.modMode(set, ModeKeyboardLock)
+-			case 4: // IRM - insertion-replacement
+-				t.modMode(set, ModeInsert)
+-				t.logln("insert mode not implemented")
+-			case 12: // SRM - send/receive
+-				t.modMode(set, ModeEcho)
+-			case 20: // LNM - linefeed/newline
+-				t.modMode(set, ModeCRLF)
+-			case 34:
+-				t.logln("right-to-left mode not implemented")
+-			case 96:
+-				t.logln("right-to-left copy mode not implemented")
+-			default:
+-				t.logf("unknown set/reset mode %d\n", a)
+-			}
+-		}
+-	}
+-}
+-
+-func (t *State) setAttr(attr []int) {
+-	if len(attr) == 0 {
+-		attr = []int{0}
+-	}
+-	for i := 0; i < len(attr); i++ {
+-		a := attr[i]
+-		switch a {
+-		case 0:
+-			t.cur.Attr.Mode &^= attrReverse | attrUnderline | attrBold | attrItalic | attrBlink
+-			t.cur.Attr.FG = DefaultFG
+-			t.cur.Attr.BG = DefaultBG
+-		case 1:
+-			t.cur.Attr.Mode |= attrBold
+-		case 3:
+-			t.cur.Attr.Mode |= attrItalic
+-		case 4:
+-			t.cur.Attr.Mode |= attrUnderline
+-		case 5, 6: // slow, rapid blink
+-			t.cur.Attr.Mode |= attrBlink
+-		case 7:
+-			t.cur.Attr.Mode |= attrReverse
+-		case 21, 22:
+-			t.cur.Attr.Mode &^= attrBold
+-		case 23:
+-			t.cur.Attr.Mode &^= attrItalic
+-		case 24:
+-			t.cur.Attr.Mode &^= attrUnderline
+-		case 25, 26:
+-			t.cur.Attr.Mode &^= attrBlink
+-		case 27:
+-			t.cur.Attr.Mode &^= attrReverse
+-		case 38:
+-			if i+2 < len(attr) && attr[i+1] == 5 {
+-				i += 2
+-				if between(attr[i], 0, 255) {
+-					t.cur.Attr.FG = Color(attr[i])
+-				} else {
+-					t.logf("bad fgcolor %d\n", attr[i])
+-				}
+-			} else {
+-				t.logf("gfx attr %d unknown\n", a)
+-			}
+-		case 39:
+-			t.cur.Attr.FG = DefaultFG
+-		case 48:
+-			if i+2 < len(attr) && attr[i+1] == 5 {
+-				i += 2
+-				if between(attr[i], 0, 255) {
+-					t.cur.Attr.BG = Color(attr[i])
+-				} else {
+-					t.logf("bad bgcolor %d\n", attr[i])
+-				}
+-			} else {
+-				t.logf("gfx attr %d unknown\n", a)
+-			}
+-		case 49:
+-			t.cur.Attr.BG = DefaultBG
+-		default:
+-			if between(a, 30, 37) {
+-				t.cur.Attr.FG = Color(a - 30)
+-			} else if between(a, 40, 47) {
+-				t.cur.Attr.BG = Color(a - 40)
+-			} else if between(a, 90, 97) {
+-				t.cur.Attr.FG = Color(a - 90 + 8)
+-			} else if between(a, 100, 107) {
+-				t.cur.Attr.BG = Color(a - 100 + 8)
+-			} else {
+-				t.logf("gfx attr %d unknown\n", a)
+-			}
+-		}
+-	}
+-}
+-
+-func (t *State) insertBlanks(n int) {
+-	src := t.cur.X
+-	dst := src + n
+-	size := t.cols - dst
+-	t.changed |= ChangedScreen
+-	t.dirty[t.cur.Y] = true
+-
+-	if dst >= t.cols {
+-		t.clear(t.cur.X, t.cur.Y, t.cols-1, t.cur.Y)
+-	} else {
+-		copy(t.lines[t.cur.Y][dst:dst+size], t.lines[t.cur.Y][src:src+size])
+-		t.clear(src, t.cur.Y, dst-1, t.cur.Y)
+-	}
+-}
+-
+-func (t *State) insertBlankLines(n int) {
+-	if t.cur.Y < t.top || t.cur.Y > t.bottom {
+-		return
+-	}
+-	t.scrollDown(t.cur.Y, n)
+-}
+-
+-func (t *State) deleteLines(n int) {
+-	if t.cur.Y < t.top || t.cur.Y > t.bottom {
+-		return
+-	}
+-	t.scrollUp(t.cur.Y, n)
+-}
+-
+-func (t *State) deleteChars(n int) {
+-	src := t.cur.X + n
+-	dst := t.cur.X
+-	size := t.cols - src
+-	t.changed |= ChangedScreen
+-	t.dirty[t.cur.Y] = true
+-
+-	if src >= t.cols {
+-		t.clear(t.cur.X, t.cur.Y, t.cols-1, t.cur.Y)
+-	} else {
+-		copy(t.lines[t.cur.Y][dst:dst+size], t.lines[t.cur.Y][src:src+size])
+-		t.clear(t.cols-n, t.cur.Y, t.cols-1, t.cur.Y)
+-	}
+-}
+-
+-func (t *State) setTitle(title string) {
+-	t.changed |= ChangedTitle
+-	t.title = title
+-}
+-
+-func (t *State) Size() (cols, rows int) {
+-	return t.cols, t.rows
+-}
+-
+-func (t *State) String() string {
+-	t.Lock()
+-	defer t.Unlock()
+-
+-	var view []rune
+-	for y := 0; y < t.rows; y++ {
+-		for x := 0; x < t.cols; x++ {
+-			attr := t.Cell(x, y)
+-			view = append(view, attr.Char)
+-		}
+-		view = append(view, '\n')
+-	}
+-
+-	return string(view)
+-}
+diff --git a/vendor/github.com/hinshun/vt10x/str.go b/vendor/github.com/hinshun/vt10x/str.go
+deleted file mode 100644
+index c8ca50c..0000000
+--- a/vendor/github.com/hinshun/vt10x/str.go
++++ /dev/null
+@@ -1,94 +0,0 @@
+-package vt10x
+-
+-import (
+-	"strconv"
+-	"strings"
+-)
+-
+-// STR sequences are similar to CSI sequences, but have string arguments (and
+-// as far as I can tell, don't really have a name; STR is the name I took from
+-// suckless which I imagine comes from rxvt or xterm).
+-type strEscape struct {
+-	typ  rune
+-	buf  []rune
+-	args []string
+-}
+-
+-func (s *strEscape) reset() {
+-	s.typ = 0
+-	s.buf = s.buf[:0]
+-	s.args = nil
+-}
+-
+-func (s *strEscape) put(c rune) {
+-	// TODO: improve allocs with an array backed slice; bench first
+-	if len(s.buf) < 256 {
+-		s.buf = append(s.buf, c)
+-	}
+-	// Going by st, it is better to remain silent when the STR sequence is not
+-	// ended so that it is apparent to users something is wrong. The length sanity
+-	// check ensures we don't absorb the entire stream into memory.
+-	// TODO: see what rxvt or xterm does
+-}
+-
+-func (s *strEscape) parse() {
+-	s.args = strings.Split(string(s.buf), ";")
+-}
+-
+-func (s *strEscape) arg(i, def int) int {
+-	if i >= len(s.args) || i < 0 {
+-		return def
+-	}
+-	i, err := strconv.Atoi(s.args[i])
+-	if err != nil {
+-		return def
+-	}
+-	return i
+-}
+-
+-func (s *strEscape) argString(i int, def string) string {
+-	if i >= len(s.args) || i < 0 {
+-		return def
+-	}
+-	return s.args[i]
+-}
+-
+-func (t *State) handleSTR() {
+-	s := &t.str
+-	s.parse()
+-
+-	switch s.typ {
+-	case ']': // OSC - operating system command
+-		switch d := s.arg(0, 0); d {
+-		case 0, 1, 2:
+-			title := s.argString(1, "")
+-			if title != "" {
+-				t.setTitle(title)
+-			}
+-		case 4: // color set
+-			if len(s.args) < 3 {
+-				break
+-			}
+-			// setcolorname(s.arg(1, 0), s.argString(2, ""))
+-		case 104: // color reset
+-			// TODO: complain about invalid color, redraw, etc.
+-			// setcolorname(s.arg(1, 0), nil)
+-		default:
+-			t.logf("unknown OSC command %d\n", d)
+-			// TODO: s.dump()
+-		}
+-	case 'k': // old title set compatibility
+-		title := s.argString(0, "")
+-		if title != "" {
+-			t.setTitle(title)
+-		}
+-	default:
+-		// TODO: Ignore these codes instead of complain?
+-		// 'P': // DSC - device control string
+-		// '_': // APC - application program command
+-		// '^': // PM - privacy message
+-
+-		t.logf("unhandled STR sequence '%c'\n", s.typ)
+-		// t.str.dump()
+-	}
+-}
+diff --git a/vendor/github.com/hinshun/vt10x/vt.go b/vendor/github.com/hinshun/vt10x/vt.go
+deleted file mode 100644
+index c4e58dd..0000000
+--- a/vendor/github.com/hinshun/vt10x/vt.go
++++ /dev/null
+@@ -1,89 +0,0 @@
+-package vt10x
+-
+-import (
+-	"bufio"
+-	"fmt"
+-	"io"
+-	"io/ioutil"
+-)
+-
+-// Terminal represents the virtual terminal emulator.
+-type Terminal interface {
+-	// View displays the virtual terminal.
+-	View
+-
+-	// Write parses input and writes terminal changes to state.
+-	io.Writer
+-
+-	// Parse blocks on read on pty or io.Reader, then parses sequences until
+-	// buffer empties. State is locked as soon as first rune is read, and unlocked
+-	// when buffer is empty.
+-	Parse(bf *bufio.Reader) error
+-}
+-
+-// View represents the view of the virtual terminal emulator.
+-type View interface {
+-	// String dumps the virtual terminal contents.
+-	fmt.Stringer
+-
+-	// Size returns the size of the virtual terminal.
+-	Size() (cols, rows int)
+-
+-	// Resize changes the size of the virtual terminal.
+-	Resize(cols, rows int)
+-
+-	// Mode returns the current terminal mode.//
+-	Mode() ModeFlag
+-
+-	// Title represents the title of the console window.
+-	Title() string
+-
+-	// Cell returns the glyph containing the character code, foreground color, and
+-	// background color at position (x, y) relative to the top left of the terminal.
+-	Cell(x, y int) Glyph
+-
+-	// Cursor returns the current position of the cursor.
+-	Cursor() Cursor
+-
+-	// CursorVisible returns the visible state of the cursor.
+-	CursorVisible() bool
+-
+-	// Lock locks the state object's mutex.
+-	Lock()
+-
+-	// Unlock resets change flags and unlocks the state object's mutex.
+-	Unlock()
+-}
+-
+-type TerminalOption func(*TerminalInfo)
+-
+-type TerminalInfo struct {
+-	w          io.Writer
+-	cols, rows int
+-}
+-
+-func WithWriter(w io.Writer) TerminalOption {
+-	return func(info *TerminalInfo) {
+-		info.w = w
+-	}
+-}
+-
+-func WithSize(cols, rows int) TerminalOption {
+-	return func(info *TerminalInfo) {
+-		info.cols = cols
+-		info.rows = rows
+-	}
+-}
+-
+-// New returns a new virtual terminal emulator.
+-func New(opts ...TerminalOption) Terminal {
+-	info := TerminalInfo{
+-		w:    ioutil.Discard,
+-		cols: 80,
+-		rows: 24,
+-	}
+-	for _, opt := range opts {
+-		opt(&info)
+-	}
+-	return newTerminal(info)
+-}
+diff --git a/vendor/github.com/hinshun/vt10x/vt_other.go b/vendor/github.com/hinshun/vt10x/vt_other.go
+deleted file mode 100644
+index c5b461a..0000000
+--- a/vendor/github.com/hinshun/vt10x/vt_other.go
++++ /dev/null
+@@ -1,107 +0,0 @@
+-// +build plan9 nacl windows
+-
+-package vt10x
+-
+-import (
+-	"bufio"
+-	"bytes"
+-	"io"
+-	"unicode"
+-	"unicode/utf8"
+-)
+-
+-type terminal struct {
+-	*State
+-}
+-
+-func newTerminal(info TerminalInfo) *terminal {
+-	t := &terminal{&State{w: info.w}}
+-	t.init(info.cols, info.rows)
+-	return t
+-}
+-
+-func (t *terminal) init(cols, rows int) {
+-	t.numlock = true
+-	t.state = t.parse
+-	t.cur.attr.fg = DefaultFG
+-	t.cur.attr.bg = DefaultBG
+-	t.Resize(cols, rows)
+-	t.reset()
+-}
+-
+-func (t *terminal) Write(p []byte) (int, error) {
+-	var written int
+-	r := bytes.NewReader(p)
+-	t.lock()
+-	defer t.unlock()
+-	for {
+-		c, sz, err := r.ReadRune()
+-		if err != nil {
+-			if err == io.EOF {
+-				break
+-			}
+-			return written, err
+-		}
+-		written += sz
+-		if c == unicode.ReplacementChar && sz == 1 {
+-			if r.Len() == 0 {
+-				// not enough bytes for a full rune
+-				return written - 1, nil
+-			}
+-			t.logln("invalid utf8 sequence")
+-			continue
+-		}
+-		t.put(c)
+-	}
+-	return written, nil
+-}
+-
+-// TODO: add tests for expected blocking behavior
+-func (t *terminal) Parse(br *bufio.Reader) error {
+-	var locked bool
+-	defer func() {
+-		if locked {
+-			t.unlock()
+-		}
+-	}()
+-	for {
+-		c, sz, err := br.ReadRune()
+-		if err != nil {
+-			return err
+-		}
+-		if c == unicode.ReplacementChar && sz == 1 {
+-			t.logln("invalid utf8 sequence")
+-			break
+-		}
+-		if !locked {
+-			t.lock()
+-			locked = true
+-		}
+-
+-		// put rune for parsing and update state
+-		t.put(c)
+-
+-		// break if our buffer is empty, or if buffer contains an
+-		// incomplete rune.
+-		n := br.Buffered()
+-		if n == 0 || (n < 4 && !fullRuneBuffered(br)) {
+-			break
+-		}
+-	}
+-	return nil
+-}
+-
+-func fullRuneBuffered(br *bufio.Reader) bool {
+-	n := br.Buffered()
+-	buf, err := br.Peek(n)
+-	if err != nil {
+-		return false
+-	}
+-	return utf8.FullRune(buf)
+-}
+-
+-func (t *terminal) Resize(cols, rows int) {
+-	t.lock()
+-	defer t.unlock()
+-	_ = t.resize(cols, rows)
+-}
+diff --git a/vendor/github.com/hinshun/vt10x/vt_posix.go b/vendor/github.com/hinshun/vt10x/vt_posix.go
+deleted file mode 100644
+index 1294f04..0000000
+--- a/vendor/github.com/hinshun/vt10x/vt_posix.go
++++ /dev/null
+@@ -1,108 +0,0 @@
+-// +build linux darwin dragonfly solaris openbsd netbsd freebsd
+-
+-package vt10x
+-
+-import (
+-	"bufio"
+-	"bytes"
+-	"io"
+-	"unicode"
+-	"unicode/utf8"
+-)
+-
+-type terminal struct {
+-	*State
+-}
+-
+-func newTerminal(info TerminalInfo) *terminal {
+-	t := &terminal{&State{w: info.w}}
+-	t.init(info.cols, info.rows)
+-	return t
+-}
+-
+-func (t *terminal) init(cols, rows int) {
+-	t.numlock = true
+-	t.state = t.parse
+-	t.cur.Attr.FG = DefaultFG
+-	t.cur.Attr.BG  = DefaultBG
+-	t.Resize(cols, rows)
+-	t.reset()
+-}
+-
+-// Write parses input and writes terminal changes to state.
+-func (t *terminal) Write(p []byte) (int, error) {
+-	var written int
+-	r := bytes.NewReader(p)
+-	t.lock()
+-	defer t.unlock()
+-	for {
+-		c, sz, err := r.ReadRune()
+-		if err != nil {
+-			if err == io.EOF {
+-				break
+-			}
+-			return written, err
+-		}
+-		written += sz
+-		if c == unicode.ReplacementChar && sz == 1 {
+-			if r.Len() == 0 {
+-				// not enough bytes for a full rune
+-				return written - 1, nil
+-			}
+-			t.logln("invalid utf8 sequence")
+-			continue
+-		}
+-		t.put(c)
+-	}
+-	return written, nil
+-}
+-
+-// TODO: add tests for expected blocking behavior
+-func (t *terminal) Parse(br *bufio.Reader) error {
+-	var locked bool
+-	defer func() {
+-		if locked {
+-			t.unlock()
+-		}
+-	}()
+-	for {
+-		c, sz, err := br.ReadRune()
+-		if err != nil {
+-			return err
+-		}
+-		if c == unicode.ReplacementChar && sz == 1 {
+-			t.logln("invalid utf8 sequence")
+-			break
+-		}
+-		if !locked {
+-			t.lock()
+-			locked = true
+-		}
+-
+-		// put rune for parsing and update state
+-		t.put(c)
+-
+-		// break if our buffer is empty, or if buffer contains an
+-		// incomplete rune.
+-		n := br.Buffered()
+-		if n == 0 || (n < 4 && !fullRuneBuffered(br)) {
+-			break
+-		}
+-	}
+-	return nil
+-}
+-
+-func fullRuneBuffered(br *bufio.Reader) bool {
+-	n := br.Buffered()
+-	buf, err := br.Peek(n)
+-	if err != nil {
+-		return false
+-	}
+-	return utf8.FullRune(buf)
+-}
+-
+-func (t *terminal) Resize(cols, rows int) {
+-	t.lock()
+-	defer t.unlock()
+-	_ = t.resize(cols, rows)
+-}
+diff --git a/vendor/modules.txt b/vendor/modules.txt
+index 1744325..ce47cf7 100644
+--- a/vendor/modules.txt
++++ b/vendor/modules.txt
+@@ -21,6 +21,19 @@ cloud.google.com/go/storage/internal/apiv2
+ dies.dev/apis/core/v1
+ dies.dev/apis/meta/v1
+ dies.dev/testing
++# github.com/ActiveState/termtest/conpty v0.5.0
++## explicit; go 1.12
++github.com/ActiveState/termtest/conpty
++# github.com/ActiveState/termtest/expect v0.7.0
++## explicit; go 1.12
++github.com/ActiveState/termtest/expect
++github.com/ActiveState/termtest/expect/internal/osutils
++# github.com/ActiveState/termtest/xpty v0.6.0
++## explicit; go 1.14
++github.com/ActiveState/termtest/xpty
++# github.com/ActiveState/vt10x v1.3.1
++## explicit; go 1.13
++github.com/ActiveState/vt10x
+ # github.com/AlecAivazis/survey/v2 v2.3.6
+ ## explicit; go 1.13
+ github.com/AlecAivazis/survey/v2
+@@ -39,6 +52,10 @@ github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-05-01/resources/r
+ github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-11-01/subscriptions
+ github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-11-01/subscriptions/subscriptionsapi
+ github.com/Azure/azure-sdk-for-go/version
++# github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1
++## explicit; go 1.16
++github.com/Azure/go-ansiterm
++github.com/Azure/go-ansiterm/winterm
+ # github.com/Azure/go-autorest v14.2.0+incompatible
+ ## explicit
+ github.com/Azure/go-autorest
+@@ -508,9 +525,6 @@ github.com/hashicorp/hcl/hcl/token
+ github.com/hashicorp/hcl/json/parser
+ github.com/hashicorp/hcl/json/scanner
+ github.com/hashicorp/hcl/json/token
+-# github.com/hinshun/vt10x v0.0.0-20220119200601-820417d04eec
+-## explicit; go 1.14
+-github.com/hinshun/vt10x
+ # github.com/huandu/xstrings v1.3.2
+ ## explicit; go 1.12
+ github.com/huandu/xstrings
+@@ -594,6 +608,9 @@ github.com/klauspost/compress/internal/cpuinfo
+ github.com/klauspost/compress/internal/snapref
+ github.com/klauspost/compress/zstd
+ github.com/klauspost/compress/zstd/internal/xxhash
++# github.com/kr/pty v1.1.8
++## explicit; go 1.12
++github.com/kr/pty
+ # github.com/lithammer/dedent v1.1.0
+ ## explicit
+ github.com/lithammer/dedent

@@ -23,12 +23,11 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/Netflix/go-expect"
+	"github.com/ActiveState/termtest/expect"
 	"github.com/google/go-cmp/cmp"
 	"github.com/spf13/cobra"
 	rtesting "github.com/vmware-labs/reconciler-runtime/testing"
@@ -272,9 +271,6 @@ func (tc CommandTestCase) Run(t *testing.T, scheme *k8sruntime.Scheme, cmdFactor
 		var console *expect.Console
 		var donec chan struct{}
 		if tc.WithConsoleInteractions != nil {
-			if runtime.GOOS == "windows" {
-				t.Skipf("test %q uses pseudo tty not supported yet for windows, skipping tets", tc.Name)
-			}
 			var err error
 			console, err = expect.NewConsole(expect.WithStdout(output), expectNoMatchingError(t), expectNoInputError(t), expect.WithDefaultTimeout(3*time.Second))
 			if err != nil {
@@ -321,7 +317,6 @@ func (tc CommandTestCase) Run(t *testing.T, scheme *k8sruntime.Scheme, cmdFactor
 
 		outputString := strings.ReplaceAll(output.String(), "\r", "")
 		if tc.ExpectOutput != "" {
-			tc.ExpectOutput = strings.ReplaceAll(tc.ExpectOutput, "\r", "")
 			if diff := cmp.Diff(strings.TrimPrefix(tc.ExpectOutput, "\n"), outputString); diff != "" {
 				t.Errorf("Unexpected output (-expected, +actual): %s", diff)
 			}
@@ -354,18 +349,22 @@ func trimTrailingSpaces(in string) string {
 
 func expectNoMatchingError(t *testing.T) expect.ConsoleOpt {
 	return expect.WithExpectObserver(
-		func(matchers []expect.Matcher, buf string, err error) {
+		func(matchers []expect.Matcher, ms *expect.MatchState, err error) {
 			if err == nil {
 				return
 			}
 			if len(matchers) == 0 {
-				t.Fatalf("Error occurred while matching %q: %s\n", buf, err)
+				t.Fatalf("Error occurred while matching %q: %s\n", ms.Buf, err)
 			} else {
 				var criteria []string
 				for _, matcher := range matchers {
+					if strings.Contains(ms.Buf.String(), fmt.Sprintf("%v", matcher.Criteria())) {
+						t.Logf("Error found while matching but match did work, ignoring due to console may close after matching validation: %v", err)
+						return
+					}
 					criteria = append(criteria, fmt.Sprintf("%q", matcher.Criteria()))
 				}
-				t.Fatalf("Unexpected output; expected: %s ; got %q: \nError: %s\n", strings.Join(criteria, ", "), buf, err)
+				t.Fatalf("Unexpected output; expected: %s ; got %q: \nError: %s\n", strings.Join(criteria, ", "), ms.Buf, err)
 			}
 		},
 	)

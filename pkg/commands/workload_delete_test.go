@@ -24,7 +24,7 @@ import (
 	"time"
 
 	diemetav1 "dies.dev/apis/meta/v1"
-	"github.com/Netflix/go-expect"
+	"github.com/ActiveState/termtest/expect"
 	rtesting "github.com/vmware-labs/reconciler-runtime/testing"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -640,9 +640,9 @@ Deleted workload "spring-petclinic"
 			Args:         []string{workloadName},
 			GivenObjects: []client.Object{parent},
 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
-				c.ExpectString(clitesting.ToInteractTerminal("Really delete the workload %q? [yN]: ", workloadName))
+				c.ExpectString(fmt.Sprintf("Really delete the workload %q? [yN]: ", workloadName))
 				c.Send(clitesting.InteractInputLine("y"))
-				c.ExpectString(clitesting.ToInteractOutput("Deleted workload %q", workloadName))
+				c.ExpectString(fmt.Sprintf("Deleted workload %q", workloadName))
 			},
 			ExpectDeletes: []rtesting.DeleteRef{{
 				Group:     "carto.run",
@@ -652,13 +652,13 @@ Deleted workload "spring-petclinic"
 			}},
 		},
 		{
-			Name:         "delete workload with console interaction rejected",
+			Name:         "delete workload with console interaction reject",
 			Args:         []string{workloadName},
 			GivenObjects: []client.Object{parent},
 			WithConsoleInteractions: func(t *testing.T, c *expect.Console) {
-				c.ExpectString(clitesting.ToInteractTerminal("Really delete the workload %q? [yN]: ", workloadName))
+				c.ExpectString(fmt.Sprintf("Really delete the workload %q? [yN]: ", workloadName))
 				c.Send(clitesting.InteractInputLine("n"))
-				c.ExpectString(clitesting.ToInteractOutput("Skipping workload %q", workloadName))
+				c.ExpectString(fmt.Sprintf("Skipping workload %q", workloadName))
 			},
 		},
 	}

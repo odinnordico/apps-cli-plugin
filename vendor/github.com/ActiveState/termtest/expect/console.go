@@ -15,16 +15,18 @@
 package expect
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
 	"time"
-	"unicode/utf8"
 
-	"github.com/creack/pty"
+	"github.com/ActiveState/termtest/expect/internal/osutils"
+	"github.com/ActiveState/termtest/xpty"
+	"github.com/ActiveState/vt10x"
 )
 
 // Console is an interface to automate input and output for interactive
@@ -32,12 +34,43 @@ import (
 // input back on it's tty. Console can also multiplex other sources of input
 // and multiplex its output to other writers.
 type Console struct {
-	opts            ConsoleOpts
-	ptm             *os.File
-	pts             *os.File
-	passthroughPipe *PassthroughPipe
-	runeReader      *bufio.Reader
-	closers         []io.Closer
+	opts       ConsoleOpts
+	Pty        *xpty.Xpty
+	MatchState *MatchState
+	closers    []io.Closer
+}
+
+type coord struct {
+	x int
+	y int
+}
+
+// MatchState describes the state of the terminal while trying to match it against an expectation
+type MatchState struct {
+	// TermState is the current terminal state
+	TermState *vt10x.State
+	// Buf is a buffer of the raw characters parsed since the last match
+	Buf        *bytes.Buffer
+	prevCoords []coord
+}
+
+// UnwrappedStringToCursorFromMatch returns the parsed string from the position of the n-last match to the cursor position
+// Terminal EOL-wrapping is removed
+func (ms *MatchState) UnwrappedStringToCursorFromMatch(n int) string {
+	var c coord
+	numCoords := len(ms.prevCoords)
+	if numCoords > 0 {
+		if n < numCoords {
+			c = ms.prevCoords[numCoords-1-n]
+		}
+	}
+	return ms.TermState.UnwrappedStringToCursorFrom(c.y, c.x)
+}
+
+func (ms *MatchState) markMatch() {
+	c := coord{}
+	c.x, c.y = ms.TermState.GlobalCursor()
+	ms.prevCoords = append(ms.prevCoords, c)
 }
 
 // ConsoleOpt allows setting Console options.
@@ -52,6 +85,8 @@ type ConsoleOpts struct {
 	ExpectObservers []ExpectObserver
 	SendObservers   []SendObserver
 	ReadTimeout     *time.Duration
+	TermCols        int
+	TermRows        int
 }
 
 // ExpectObserver provides an interface for a function callback that will
@@ -60,13 +95,13 @@ type ConsoleOpts struct {
 //   or a list of matchers that matched `buf` when err is nil.
 // buf is the captured output that was matched against.
 // err is error that might have occurred. May be nil.
-type ExpectObserver func(matchers []Matcher, buf string, err error)
+type ExpectObserver func(matchers []Matcher, ms *MatchState, err error)
 
 // SendObserver provides an interface for a function callback that will
 // be called after each Send operation.
 // msg is the string that was sent.
 // num is the number of bytes actually sent.
-// err is the error that might have occured.  May be nil.
+// err is the error that might have occurred.  May be nil.
 type SendObserver func(msg string, num int, err error)
 
 // WithStdout adds writers that Console duplicates writes to, similar to the
@@ -133,10 +168,28 @@ func WithDefaultTimeout(timeout time.Duration) ConsoleOpt {
 	}
 }
 
+// WithTermCols sets the number of columns in the terminal (Default: 80)
+func WithTermCols(cols int) ConsoleOpt {
+	return func(opts *ConsoleOpts) error {
+		opts.TermCols = cols
+		return nil
+	}
+}
+
+// WithTermRows sets the number of rows in the terminal (Default: 80)
+func WithTermRows(rows int) ConsoleOpt {
+	return func(opts *ConsoleOpts) error {
+		opts.TermRows = rows
+		return nil
+	}
+}
+
 // NewConsole returns a new Console with the given options.
 func NewConsole(opts ...ConsoleOpt) (*Console, error) {
 	options := ConsoleOpts{
-		Logger: log.New(ioutil.Discard, "", 0),
+		Logger:   log.New(ioutil.Discard, "", 0),
+		TermCols: 80,
+		TermRows: 30,
 	}
 
 	for _, opt := range opts {
@@ -145,25 +198,25 @@ func NewConsole(opts ...ConsoleOpt) (*Console, error) {
 		}
 	}
 
-	ptm, pts, err := pty.Open()
+	var pty *xpty.Xpty
+	rows := uint16(options.TermRows)
+	cols := uint16(options.TermCols)
+	// On Windows we are adding an extra row, because the last row appears to be empty usually
+	if runtime.GOOS == "windows" {
+		rows++
+	}
+	pty, err := xpty.New(cols, rows, true)
 	if err != nil {
 		return nil, err
 	}
-	closers := append(options.Closers, pts, ptm)
-
-	passthroughPipe, err := NewPassthroughPipe(ptm)
-	if err != nil {
-		return nil, err
-	}
-	closers = append(closers, passthroughPipe)
 
 	c := &Console{
-		opts:            options,
-		ptm:             ptm,
-		pts:             pts,
-		passthroughPipe: passthroughPipe,
-		runeReader:      bufio.NewReaderSize(passthroughPipe, utf8.UTFMax),
-		closers:         closers,
+		opts: options,
+		Pty:  pty,
+		MatchState: &MatchState{
+			TermState: pty.State,
+		},
+		closers: append(options.Closers),
 	}
 
 	for _, stdin := range options.Stdins {
@@ -179,44 +232,54 @@ func NewConsole(opts ...ConsoleOpt) (*Console, error) {
 }
 
 // Tty returns Console's pts (slave part of a pty). A pseudoterminal, or pty is
-// a pair of psuedo-devices, one of which, the slave, emulates a real text
+// a pair of pseudo-devices, one of which, the slave, emulates a real text
 // terminal device.
 func (c *Console) Tty() *os.File {
-	return c.pts
-}
-
-// Read reads bytes b from Console's tty.
-func (c *Console) Read(b []byte) (int, error) {
-	return c.ptm.Read(b)
+	return c.Pty.Tty()
 }
 
 // Write writes bytes b to Console's tty.
 func (c *Console) Write(b []byte) (int, error) {
 	c.Logf("console write: %q", b)
-	return c.ptm.Write(b)
+	return c.Pty.TerminalInPipe().Write(b)
 }
 
 // Fd returns Console's file descripting referencing the master part of its
 // pty.
 func (c *Console) Fd() uintptr {
-	return c.ptm.Fd()
+	return c.Pty.TerminalOutFd()
 }
 
-// Close closes Console's tty. Calling Close will unblock Expect and ExpectEOF.
-func (c *Console) Close() error {
+// CloseReaders closes everything that is trying to read from the terminal
+// Call this function once you are sure that you have consumed all bytes
+func (c *Console) CloseReaders() (err error) {
 	for _, fd := range c.closers {
-		err := fd.Close()
+		err = fd.Close()
 		if err != nil {
 			c.Logf("failed to close: %s", err)
 		}
 	}
-	return nil
+
+	return c.Pty.CloseReaders()
+}
+
+// Close closes both the TTY and afterwards all the readers
+// You may want to split this up to give the readers time to read all the data
+// until they reach the EOF error
+func (c *Console) Close() error {
+	err := c.Pty.CloseTTY()
+	if err != nil {
+		c.Logf("failed to close TTY: %v", err)
+	}
+
+	// close the readers reading from the TTY
+	return c.CloseReaders()
 }
 
 // Send writes string s to Console's tty.
 func (c *Console) Send(s string) (int, error) {
 	c.Logf("console send: %q", s)
-	n, err := c.ptm.WriteString(s)
+	n, err := io.WriteString(c.Pty.TerminalInPipe(), s)
 	for _, observer := range c.opts.SendObservers {
 		observer(s, n, err)
 	}
@@ -226,6 +289,11 @@ func (c *Console) Send(s string) (int, error) {
 // SendLine writes string s to Console's tty with a trailing newline.
 func (c *Console) SendLine(s string) (int, error) {
 	return c.Send(fmt.Sprintf("%s\n", s))
+}
+
+// SendOSLine writes string s to Console's tty with a trailing newline separator native to the base OS.
+func (c *Console) SendOSLine(s string) (int, error) {
+	return c.Send(fmt.Sprintf("%s%s", s, osutils.LineSep))
 }
 
 // Log prints to Console's logger.
